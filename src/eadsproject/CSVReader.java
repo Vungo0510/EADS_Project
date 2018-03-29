@@ -22,9 +22,6 @@ public class CSVReader {
     public HashMap<Integer, ArrayList<Integer>> readAllCornerNodes() {
 
         String csvFile = "./Data/CornerNodes.csv";
-       
-        File f = new File("./Data/CornerNodes.csv");
-        System.out.println(f.getAbsolutePath());
         
         BufferedReader br = null;
         String line = "";
@@ -70,9 +67,9 @@ public class CSVReader {
         return cornerNodesMap;
     }
     
-    public ArrayList<String> readPickingList() {
+    public ArrayList<String> readPickingList(String csvFile) {
 
-        String csvFile = "./Data/PickingList.csv"; //Already shifted to the correct position for ppl to walk on
+        //String csvFile = "./Data/PickingList.csv"; //Already shifted to the correct position for ppl to walk on
        
         File f = new File("./Data/PickingList.csv");
         System.out.println(f.getAbsolutePath());

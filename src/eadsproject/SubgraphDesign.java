@@ -15,10 +15,9 @@ public class SubgraphDesign {
     private CSVReader csvReader = new CSVReader();
     private HashMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes(); //contains the y coordinates of all the corner nodes with the same x coordinates. key is x coordinate
     
-    public ArrayList<String> getPickingListCornerNodes() {
+    public ArrayList<String> getPickingListCornerNodes(ArrayList<String> pickingList) {
         
         ArrayList<String> storeAllPickItemCornerNodes = new ArrayList<String>();
-        ArrayList<String> pickingList = csvReader.readPickingList();
         
         for (int i = 0; i < pickingList.size(); i++) {
             String pickItem = pickingList.get(i);
@@ -51,10 +50,10 @@ public class SubgraphDesign {
         return storeAllPickItemCornerNodes;
     }
     
-    public ArrayList<String> subgraphPartitioning() {
+    public ArrayList<String> subgraphPartitioning(ArrayList<String> pickingList) {
         
     //this method will return all the corner nodes found within the subgraph
-        ArrayList<String> pickListCornerNodes = getPickingListCornerNodes();
+        ArrayList<String> pickListCornerNodes = getPickingListCornerNodes(pickingList);
         Integer largestX = -1;
         Integer largestY = -1;
         Integer smallestX = Integer.MAX_VALUE;
@@ -96,7 +95,6 @@ public class SubgraphDesign {
                 }
             }
         }
-        ArrayList<String> pickingList = csvReader.readPickingList();
         
         for (int i = 0; i < pickingList.size(); i++) {
             // Adding pick items' x and y coordinates into cornerNodesWithinBorder ArrayList

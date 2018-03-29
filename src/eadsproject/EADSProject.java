@@ -18,10 +18,21 @@ import java.util.*;
 public class EADSProject {
      public static void main(String[] args) {
         SubgraphDesign subgraphDesign = new SubgraphDesign();
-        System.out.println(subgraphDesign.subgraphPartitioning());
-     
-         
-         
-         //System.out.println(pickingList);
+        //System.out.println(subgraphDesign.subgraphPartitioning());
+        //System.out.println(pickingList);
+        String csvFile = "./Data/PickingList.csv";
+        CSVReader csvReader = new CSVReader();
+        ArrayList<String> pickingList = csvReader.readPickingList(csvFile);
+        
+        Clarke c = new Clarke();
+        HashMap<String, Integer> distOfStartPtToAllPt = c.getInitialSolution(pickingList);
+        
+        HashMap<String, Integer> distAmongPickItems = c.getPointToPointDistance(pickingList);
+        
+        HashMap<String, Integer> savingsMap = c.getSavingsMap(pickingList);
+        
+        //System.out.println(distOfStartPtToAllPt);
+        //System.out.println(distAmongPickItems);
+        System.out.println(savingsMap);
      }
 }
