@@ -17,22 +17,36 @@ import java.util.*;
  */
 public class EADSProject {
      public static void main(String[] args) {
-        SubgraphDesign subgraphDesign = new SubgraphDesign();
-        //System.out.println(subgraphDesign.subgraphPartitioning());
+        
         //System.out.println(pickingList);
         String csvFile = "./Data/PickingList.csv";
         CSVReader csvReader = new CSVReader();
         ArrayList<String> pickingList = csvReader.readPickingList(csvFile);
+        //SubgraphDesign subgraphDesign = new SubgraphDesign();
+        //System.out.println(subgraphDesign.getPickingListCornerNodes(pickingList));
         
         Clarke c = new Clarke();
-        HashMap<String, Integer> distOfStartPtToAllPt = c.getInitialSolution(pickingList);
         
-        HashMap<String, Integer> distAmongPickItems = c.getPointToPointDistance(pickingList);
+        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList);
+        HashMap<String, Integer> distOfStartPtToAllPt = intialSolution.get(0);
+        
+        ArrayList<HashMap> ptToPtRouteAndDistanceArr = c.getPointToPointDistance(pickingList);
+        HashMap<String, Integer> distAmongPickItems = ptToPtRouteAndDistanceArr.get(0);
         
         HashMap<String, Integer> savingsMap = c.getSavingsMap(pickingList);
         
-        //System.out.println(distOfStartPtToAllPt);
-        //System.out.println(distAmongPickItems);
+        HashMap<String, String> solutionMap = c.getSolution(savingsMap, 3000.00);
+        
+        HashMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes();
+        System.out.println("corner nodes: ");
+        System.out.println(cornerNodesMap);
+        System.out.println("Step 1: ");
+        System.out.println(distOfStartPtToAllPt);
+        System.out.println("Step 2: ");
+        System.out.println(distAmongPickItems);
+        System.out.println("Step 3: ");
         System.out.println(savingsMap);
+        System.out.println("Step 4 and 5:");
+        System.out.println(solutionMap);
      }
 }
