@@ -22,8 +22,11 @@ public class EADSProject {
         String csvFile = "./Data/PickingList.csv";
         CSVReader csvReader = new CSVReader();
         ArrayList<String> pickingList = csvReader.readPickingList(csvFile);
+        HashMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes();
+        HashMap<String, Integer> pickItemCapacityMap = csvReader.readPickItemCapacity(csvFile);
         //SubgraphDesign subgraphDesign = new SubgraphDesign();
         //System.out.println(subgraphDesign.getPickingListCornerNodes(pickingList));
+        System.out.println(pickingList);
         
         Clarke c = new Clarke();
         
@@ -35,9 +38,10 @@ public class EADSProject {
         
         HashMap<String, Integer> savingsMap = c.getSavingsMap(pickingList);
         
-        HashMap<String, String> solutionMap = c.getSolution(savingsMap, 3000.00);
+        HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, 2.00);
         
-        HashMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes();
+        ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap);
+        
         System.out.println("corner nodes: ");
         System.out.println(cornerNodesMap);
         System.out.println("Step 1: ");
@@ -48,5 +52,7 @@ public class EADSProject {
         System.out.println(savingsMap);
         System.out.println("Step 4 and 5:");
         System.out.println(solutionMap);
+        System.out.println("Step 5b:");
+        System.out.println(finalRoutes);
      }
 }

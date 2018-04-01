@@ -32,6 +32,7 @@ public class Clarke {
         Integer yCoordNearestCornerToStartPt = -1;
         int currDiff = Integer.MAX_VALUE;
         
+        //Iterate through the ArrayList above and find the y coordinate that is nearest to start pt's y coordinate
         for (Integer yCoordCornerPt : yCoordinatesOfCornerNodesNearStartPt) {
             if (Math.abs(yCoordCornerPt - yCoordinateOfStartPt) < currDiff) {
                 yCoordNearestCornerToStartPt = yCoordCornerPt;
@@ -48,20 +49,11 @@ public class Clarke {
             int xCoordinateOfPickItem = Integer.parseInt(s.split(",")[1]);
             int yCoordinateOfPickItem = Integer.parseInt(s.split(",")[2]);
             
-            //ArrayList<Integer> yCoordinatesOfCornerNodesNearPickItem = cornerNodesMap.get(xCoordinateOfPickItem);
-            /*Integer nearestCornerYCoordToPickItem = -1;
-            currDiff = Integer.MAX_VALUE;
-
-            for (Integer yCoordCornerPt : yCoordinatesOfCornerNodesNearPickItem) {
-                if (Math.abs(yCoordCornerPt - yCoordinateOfPickItem) < currDiff) {
-                    nearestCornerYCoordToPickItem = yCoordCornerPt;
-                    currDiff = Math.abs(yCoordCornerPt - yCoordinateOfPickItem);
-                }
-            }
-            */
-
+            //dist from start to pick item = dist from start to nearest corner node A with same x coordinate + dist from corner node A to corner node B with same y coordinate as A and x coordinate of pick item + dist from corner node B to pick item  
             int distFromStartPtToPickItem = Math.abs(yCoordinateOfStartPt - yCoordNearestCornerToStartPt) + Math.abs(xCoordinateOfStartPt - xCoordinateOfPickItem) + Math.abs(yCoordNearestCornerToStartPt - yCoordinateOfPickItem);
             distOfStartPtToAllPt.put(xCoordinateOfPickItem + "," + yCoordinateOfPickItem, distFromStartPtToPickItem);
+            
+            //save the full route in case we need to retrieve later
             routeOfStartPtToAllPt.put(xCoordinateOfPickItem + "," + yCoordinateOfPickItem, xCoordinateOfStartPt + "," + yCoordinateOfStartPt + "-" + xCoordinateOfStartPt + "," + yCoordNearestCornerToStartPt + "-" + xCoordinateOfPickItem + "," + yCoordNearestCornerToStartPt + "-" + xCoordinateOfPickItem + "," + yCoordinateOfPickItem);
         }
         initialSolution.add(distOfStartPtToAllPt);
@@ -82,10 +74,12 @@ public class Clarke {
             int xCoordinateOfCurrentPickNode = Integer.parseInt(currentPickNode.split(",")[1]);
             int yCoordinateOfCurrentPickNode = Integer.parseInt(currentPickNode.split(",")[2]);
             
+            //ArrayList of y coordinates corner nodes that have the same x as current pick node
             ArrayList<Integer> yCoordinatesOfCornerNodesNearCurrPickNode = cornerNodesMap.get(xCoordinateOfCurrentPickNode);
             Integer yCoordNearestCornerToCurrPickNode = -1;
             int currDiff = Integer.MAX_VALUE;
-
+            
+            //Iterate through the ArrayList above and find the y coordinate that is nearest to current pick node's y coordinate
             for (Integer yCoordCornerPt : yCoordinatesOfCornerNodesNearCurrPickNode) {
                 if (Math.abs(yCoordCornerPt - yCoordinateOfCurrentPickNode) < currDiff) {
                     yCoordNearestCornerToCurrPickNode = yCoordCornerPt;
@@ -103,9 +97,12 @@ public class Clarke {
 
                 int xCoordinateOfOtherPickNode = Integer.parseInt(otherPickNode.split(",")[1]);
                 int yCoordinateOfOtherPickNode = Integer.parseInt(otherPickNode.split(",")[2]);
-
+                
+                //dist from current pick node to other pick node = dist from current pick node to nearest corner node A with same x coordinate as current pick node + dist from corner node A to corner node B with same y coordinate as A and x coordinate of other pick item + dist from corner node B to other pick node
                 int distFromCurrentPickNodeToOtherPickNode = Math.abs(yCoordinateOfOtherPickNode - yCoordNearestCornerToCurrPickNode) + Math.abs(xCoordinateOfOtherPickNode - xCoordinateOfCurrentPickNode) + Math.abs(yCoordNearestCornerToCurrPickNode - yCoordinateOfCurrentPickNode);
                 distAmongPickItems.put(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode, distFromCurrentPickNodeToOtherPickNode);   
+                
+                //save the route so that we can use in local search later!
                 routeFromCurrPickNodeToOtherPickNode.put(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode, xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "-" + xCoordinateOfCurrentPickNode + "," + yCoordNearestCornerToCurrPickNode + "-" + xCoordinateOfOtherPickNode + "," + yCoordNearestCornerToCurrPickNode + "-" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode);
             }
         }
@@ -149,13 +146,14 @@ public class Clarke {
         
         List<String> mapKeys = new ArrayList<>(savingsMap.keySet());
         List<Integer> mapValues = new ArrayList<>(savingsMap.values());
+        
+        //sort savings map descendingly
         Collections.sort(mapValues, new Comparator<Integer>() {
                 @Override
                 public int compare(Integer e1, Integer e2) {
                     return e2 - e1;
                 }
             });
-        //Collections.sort(mapKeys);
         
         LinkedHashMap<String, Integer> sortedSavingsMap = new LinkedHashMap<>();
 
@@ -180,62 +178,192 @@ public class Clarke {
     }
     
     //Step 4
-    public HashMap<String, String> getSolution(HashMap<String, Integer> savingsMap, Double mheCapacity) {
-        HashMap<String, String> solutionMap = new HashMap<String, String>(); 
+    public HashMap<String, String> getSolution(HashMap<String, Integer> pickItemCapacityMap, HashMap<String, Integer> savingsMap, Double mheCapacity) {
+        HashMap<String, String> solutionMap = new HashMap<>(); 
+        HashMap<String, Integer> capacityMap = new HashMap<>();
         
+        int totalCapacityOfThisRoute = 0;
         Set solutionMapKeySet = savingsMap.keySet();
         
         Iterator<String> keySetIter = solutionMapKeySet.iterator();
-        while (keySetIter.hasNext()) {
+        
+        while (keySetIter.hasNext()) { //iterate through all records in savingsMap
             String thisKey = keySetIter.next();
             String[] thisKeyArr = thisKey.split("to");
-            String item = thisKeyArr[0]; //this contains x-y coordinate of the first pick item (before "to") from savings map
+            
+            String thisItem = thisKeyArr[0]; //this contains x-y coordinate of the first pick item (before "to") from savings map
             String anotherItem = thisKeyArr[1]; //this contains x-y coordinate of the second pick item (after "to") from savings map
             
+            //if capacity of thisItem is 0, make it 1 as we're using at least 1 carton. Else keep it as it is
+            int thisItemCapacity = pickItemCapacityMap.get(thisItem) > 0 ? pickItemCapacityMap.get(thisItem) : 1;
+            
+            //if capacity of anotherItem is 0, make it 1 as we're using at least 1 carton. Else keep it as it is
+            int anotherItemCapacity = pickItemCapacityMap.get(anotherItem) > 0 ? pickItemCapacityMap.get(anotherItem) : 1;
+            
             //If both pick items are not found in solutionMap
-            if (solutionMap.get(item) == null && solutionMap.get(anotherItem) == null) {
-                solutionMap.put(item, item + "-" + anotherItem);
-                solutionMap.put(anotherItem, item + "-" + anotherItem);
+            if (solutionMap.get(thisItem) == null && solutionMap.get(anotherItem) == null) {
+                totalCapacityOfThisRoute = 0;
                 
-            } else if (solutionMap.get(item) == null) { //if only anotherItem is found in solutionMap
+                if (thisItemCapacity <= mheCapacity) {
+                    totalCapacityOfThisRoute += thisItemCapacity;  
+                    solutionMap.put(thisItem, thisItem);
+                    capacityMap.put(thisItem, totalCapacityOfThisRoute);
+                }
+                
+                if (totalCapacityOfThisRoute + anotherItemCapacity <= mheCapacity) {
+                    totalCapacityOfThisRoute += anotherItemCapacity;
+                    
+                    solutionMap.put(thisItem, thisItem + "-" + anotherItem);
+                    solutionMap.put(anotherItem, thisItem + "-" + anotherItem);
+                    
+                    capacityMap.put(thisItem, totalCapacityOfThisRoute);
+                    capacityMap.put(anotherItem, totalCapacityOfThisRoute);
+                
+                } else if (anotherItemCapacity <= mheCapacity) { //if anotherItem cannot be in the same route with thisItem
+                    solutionMap.put(anotherItem, anotherItem);
+                    capacityMap.put(anotherItem, anotherItemCapacity);
+                }
+                           
+            } else if (solutionMap.get(thisItem) == null) { //if anotherItem is found in solutionMap while thisItem isn't
                 String currentRoute = solutionMap.get(anotherItem);
+                Integer currentRouteCapacity = capacityMap.get(anotherItem);
+                
                 String[] currentRouteSplit = currentRoute.split("-");
                 String newRoute = currentRoute;
                         
                 if (currentRouteSplit[0].equals(anotherItem)) {
-                    newRoute = item + "-" + currentRoute;        
+                    newRoute = thisItem + "-" + currentRoute;        
                 } else if (currentRouteSplit[currentRouteSplit.length - 1].equals(anotherItem)) {
-                    newRoute = currentRoute + "-" + item;       
-                } else {
-                    solutionMap.put(item, item);
-                }
+                    newRoute = currentRoute + "-" + thisItem;       
+                } 
                 
-                if (!newRoute.equals(currentRoute)) {
+                if (!newRoute.equals(currentRoute) && currentRouteCapacity + thisItemCapacity <= mheCapacity) { //if anotherItem is either the first or last node AND new capacity after adding in thisItem is not exceeded
+                    currentRouteCapacity += thisItemCapacity;  
                     for (int i = 0; i < currentRouteSplit.length; i++) {
                         solutionMap.put(currentRouteSplit[i], newRoute);
+                        capacityMap.put(currentRouteSplit[i], currentRouteCapacity);
                     }
-                    solutionMap.put(item, newRoute);
+                    
+                    solutionMap.put(thisItem, newRoute);
+                    capacityMap.put(thisItem, currentRouteCapacity);
+                    
+                } else if (thisItemCapacity <= mheCapacity) { //if anotherItem's position in the route isn't the first or last node OR if adding thisItem in anotherItem's route will exceed capacity, we have to create a new route for thisItem
+                    solutionMap.put(thisItem, thisItem);
+                    capacityMap.put(thisItem,thisItemCapacity);  
                 }
    
-            } else if (solutionMap.get(anotherItem) == null) { //if only item is found in solutionMap
+            } else if (solutionMap.get(anotherItem) == null) { //if only thisItem is found in solutionMap
                 
-                String currentRoute = solutionMap.get(item);
+                String currentRoute = solutionMap.get(thisItem);
+                Integer currentRouteCapacity = capacityMap.get(thisItem);
+                
                 String[] currentRouteSplit = currentRoute.split("-");
                 String newRoute = currentRoute;
                 
-                if (currentRouteSplit[0].equals(item)) {
+                if (currentRouteSplit[0].equals(thisItem)) {
                     newRoute = anotherItem + "-" + currentRoute;        
-                } else if (currentRouteSplit[currentRouteSplit.length - 1].equals(item)) {
+                } else if (currentRouteSplit[currentRouteSplit.length - 1].equals(thisItem)) {
                     newRoute = currentRoute + "-" + anotherItem;       
-                } else {
-                    solutionMap.put(anotherItem, anotherItem);
-                }
+                } 
                 
-                if (!newRoute.equals(currentRoute)) {
+                if (!newRoute.equals(currentRoute) && currentRouteCapacity + anotherItemCapacity <= mheCapacity) { //if thisItem is either the first or last node AND new capacity after adding in anotherItem is not exceeded
+                    currentRouteCapacity += anotherItemCapacity;  
                     for (int i = 0; i < currentRouteSplit.length; i++) {
                         solutionMap.put(currentRouteSplit[i], newRoute);
+                        capacityMap.put(currentRouteSplit[i], currentRouteCapacity);
                     }
+                    
                     solutionMap.put(anotherItem, newRoute);
+                    capacityMap.put(anotherItem, currentRouteCapacity);
+                    
+                } else if (anotherItemCapacity <= mheCapacity) { //if thisItem's position in the route isn't the first or last node OR if adding anotherItem in thisItem's route will exceed capacity, we have to create a new route for anotherItem
+                    solutionMap.put(anotherItem, anotherItem);
+                    capacityMap.put(anotherItem,anotherItemCapacity);  
+                }
+            } else { //if both thisItem and anotherItem are currently assigned to a route
+                String thisRoute = solutionMap.get(thisItem);
+                Integer thisRouteCapacity = capacityMap.get(thisItem);
+                
+                String anotherRoute = solutionMap.get(anotherItem);
+                Integer anotherRouteCapacity = capacityMap.get(anotherItem);
+                
+                String[] thisRouteSplit = thisRoute.split("-");
+                String[] anotherRouteSplit = anotherRoute.split("-");
+                
+                String newRoute = "";
+                Integer combinedCapacity = thisRouteCapacity + anotherRouteCapacity;
+                
+                //if thisItem and anotherItem belong to diff routes & if capacity of combined route doesn't exceed capacity limit
+                if (!thisRoute.equals(anotherRoute) && combinedCapacity <= mheCapacity) {
+                    
+                    //if thisItem and anotherItem both appear at either the first or last position of their routes: we have to flip the shorter route before merging
+                    if ((thisRouteSplit[0].equals(thisItem) && anotherRouteSplit[0].equals(anotherItem)) || (thisRouteSplit[thisRouteSplit.length - 1].equals(thisItem) && anotherRouteSplit[anotherRouteSplit.length - 1].equals(anotherItem))) {
+                        
+                        if (thisRouteSplit.length > anotherRouteSplit.length) { //if thisRoute is longer than anotherRoute
+                            
+                            if (thisRouteSplit[0].equals(thisItem)) { //if thisItem and anotherItem are both first nodes in their routes, new route = flipped route + this route
+                                String flippedAnotherRoute = "";
+                            
+                                for (int i = anotherRouteSplit.length -1; i >= 0; i--) {
+                                    flippedAnotherRoute += anotherRouteSplit[i] + ",";
+                                }
+
+                                newRoute = flippedAnotherRoute + thisRoute;
+                            } else { //if thisItem and anotherItem are both last nodes in their routes, new route = this route + flipped route 
+                                newRoute = thisRoute;
+                                
+                                String flippedAnotherRoute = "";
+                            
+                                for (int i = anotherRouteSplit.length -1; i >= 0; i--) {
+                                    flippedAnotherRoute += anotherRouteSplit[i] + ",";
+                                }
+
+                                newRoute += flippedAnotherRoute;
+                            }
+                            
+                        } else { //if thisRoute is shorter than or as long as anotherRoute
+                            
+                            if (thisRouteSplit[0].equals(thisItem)) { //if thisItem and anotherItem are both first nodes in their routes, new route = flipped route + this route
+                                String flippedThisRoute = "";
+                            
+                                for (int i = thisRouteSplit.length -1; i >= 0; i--) {
+                                    flippedThisRoute += thisRouteSplit[i] + ",";
+                                }
+
+                                newRoute = flippedThisRoute + anotherRoute;
+                            } else { //if thisItem and anotherItem are both last nodes in their routes, new route = this route + flipped route 
+                                newRoute = anotherRoute;
+                                
+                                String flippedThisRoute = "";
+                            
+                                for (int i = thisRouteSplit.length -1; i >= 0; i--) {
+                                    flippedThisRoute += thisRouteSplit[i] + ",";
+                                }
+                                newRoute += flippedThisRoute;
+                            }
+                        }
+                    } 
+                    //if thisItem and anotherItem appear at different ends of their own routes, just need to merge the 2 routes without flipping
+                    else if ((thisRouteSplit[0].equals(thisItem) && anotherRouteSplit[anotherRouteSplit.length - 1].equals(anotherItem)) || (thisRouteSplit[thisRouteSplit.length - 1].equals(thisItem) && anotherRouteSplit[0].equals(anotherItem))) {
+                        
+                        if (thisRouteSplit[0].equals(thisItem)) { //if thisItem appears at the start of its route and anotherItem appears at the end, we have new route = another route + this route
+                            newRoute = anotherRoute + thisRoute;
+                        } else {
+                            newRoute = thisRoute + anotherRoute;
+                        }  
+                    }
+                }
+                
+                if (!newRoute.equals("")) { //if there was a route merge
+                    for (String nodeInThisRoute : thisRouteSplit) {
+                        solutionMap.put(nodeInThisRoute, newRoute);
+                        capacityMap.put(nodeInThisRoute, combinedCapacity);
+                    }
+                    
+                    for (String nodeInAnotherRoute : anotherRouteSplit) {
+                        solutionMap.put(nodeInAnotherRoute, newRoute);
+                        capacityMap.put(nodeInAnotherRoute, combinedCapacity);
+                    }
                 }
             }
         }
@@ -243,7 +371,7 @@ public class Clarke {
         Set updatedSolutionMapKeySet = solutionMap.keySet();
         Iterator<String> secondKeySetIter = updatedSolutionMapKeySet.iterator();
         
-        while (secondKeySetIter.hasNext()) {
+        while (secondKeySetIter.hasNext()) { //iterate through all routes in solutionMap and add in the end node. End node has the same X coordinate as the last pick node and Y coordinate = 1
             String thisKey = secondKeySetIter.next();
             String thisRoute = solutionMap.get(thisKey);
             String[] thisRouteArr = thisRoute.split("-");
@@ -253,5 +381,23 @@ public class Clarke {
             solutionMap.put(thisKey, startingPoint + "-" + thisRoute + "-" + lastPickItemXCoordinate + ",1");
         }
         return solutionMap;
+    }
+    
+    //This method retrieves unique routes from solutionMap by iterating through them and compare the HashMap values
+    public ArrayList<String> getFinalRoutes (HashMap<String, String> solutionMap) {
+        ArrayList<String> finalRoutes = new ArrayList<String>();
+        Set solutionMapKeySet = solutionMap.keySet();
+        Iterator<String> keySetIter = solutionMapKeySet.iterator();
+        
+        while (keySetIter.hasNext()) { //iterate through all routes in solutionMap and add in the end node. End node has the same X coordinate as the last pick node and Y coordinate = 1
+            String thisKey = keySetIter.next();
+            String thisRoute = solutionMap.get(thisKey);
+            String[] thisRouteSplit = thisRoute.split("-");
+            
+            if(!finalRoutes.contains(thisRoute)) {
+                finalRoutes.add(thisRoute);
+            }  
+        }
+        return finalRoutes;
     }
 }

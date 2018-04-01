@@ -92,7 +92,8 @@ public class CSVReader {
                 String xCoordinate = pickItem[4];
                 String yCoordinate = pickItem[5];
                 String zCoordinate = pickItem[6];
-                String pickItemString = originalLocation + "," + xCoordinate + "," + yCoordinate + "," + zCoordinate;
+                String numOfCartons = pickItem[7];
+                String pickItemString = originalLocation + "," + xCoordinate + "," + yCoordinate + "," + zCoordinate + "," + numOfCartons;
                 
                 if (!pickingList.contains(pickItemString)) {
                     pickingList.add(pickItemString);
@@ -112,6 +113,54 @@ public class CSVReader {
             }
         }
         return pickingList;
+    }
+    
+    public HashMap<String, Integer> readPickItemCapacity (String csvFile) {
+
+        //String csvFile = "./Data/PickingList.csv"; //Already shifted to the correct position for ppl to walk on
+       
+        File f = new File("./Data/PickingList.csv");
+        System.out.println(f.getAbsolutePath());
+        
+        BufferedReader br = null;
+        String line = "";
+        String cvsSplitBy = ",";
+        //System.out.println(csvFile);
+        HashMap<String, Integer> pickItemCapacityMap = new HashMap<String, Integer>();
+        
+        try {
+            br = new BufferedReader(new FileReader(csvFile));
+            line = br.readLine(); //skip first line
+            
+            while ((line = br.readLine()) != null) {
+
+                // use comma as separator
+                String[] pickItem = line.split(cvsSplitBy);
+                String xCoordinate = pickItem[4];
+                String yCoordinate = pickItem[5];
+                Integer numOfCartons = Integer.parseInt(pickItem[7]);
+                Integer existingCapacityAtPickLocation = pickItemCapacityMap.get(xCoordinate + "," + yCoordinate);
+                
+                if (existingCapacityAtPickLocation == null) {
+                    pickItemCapacityMap.put(xCoordinate + "," + yCoordinate, numOfCartons);
+                } else {
+                    pickItemCapacityMap.put(xCoordinate + "," + yCoordinate, existingCapacityAtPickLocation + numOfCartons);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return pickItemCapacityMap;
     }
     
 }
