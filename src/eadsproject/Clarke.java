@@ -51,9 +51,11 @@ public class Clarke {
             
             //dist from start to pick item = dist from start to nearest corner node A with same x coordinate + dist from corner node A to corner node B with same y coordinate as A and x coordinate of pick item + dist from corner node B to pick item  
             int distFromStartPtToPickItem = Math.abs(yCoordinateOfStartPt - yCoordNearestCornerToStartPt) + Math.abs(xCoordinateOfStartPt - xCoordinateOfPickItem) + Math.abs(yCoordNearestCornerToStartPt - yCoordinateOfPickItem);
+            
+            //key is x-y coordinate of the pick node, value is distance from start node to pick node
             distOfStartPtToAllPt.put(xCoordinateOfPickItem + "," + yCoordinateOfPickItem, distFromStartPtToPickItem);
             
-            //save the full route in case we need to retrieve later
+            //save the full route in case we need to retrieve later. Key is x-y coordinate of the pick node, value is the full route from start node to pick node
             routeOfStartPtToAllPt.put(xCoordinateOfPickItem + "," + yCoordinateOfPickItem, xCoordinateOfStartPt + "," + yCoordinateOfStartPt + "-" + xCoordinateOfStartPt + "," + yCoordNearestCornerToStartPt + "-" + xCoordinateOfPickItem + "," + yCoordNearestCornerToStartPt + "-" + xCoordinateOfPickItem + "," + yCoordinateOfPickItem);
         }
         initialSolution.add(distOfStartPtToAllPt);
@@ -63,7 +65,7 @@ public class Clarke {
     
     //Step 2
     public ArrayList<HashMap> getPointToPointDistance(ArrayList<String> pickingList) {
-        // this method calculates the distance from starting pt to all pick nodes, pickingList passed in contains all the pick nodes
+        // this method calculates the distance from each pick node to all pick nodes, pickingList passed in contains all the pick nodes
         HashMap<String, Integer> distAmongPickItems = new HashMap<String, Integer>(); //key is x,y coordinate of current pick node "to" x,y coordinate of other pick node. value is distance
         HashMap<String, String> routeFromCurrPickNodeToOtherPickNode = new HashMap<String, String>();
         ArrayList<HashMap> ptToPtRouteAndDistanceArr = new ArrayList<HashMap>();
@@ -305,7 +307,7 @@ public class Clarke {
                                 String flippedAnotherRoute = "";
                             
                                 for (int i = anotherRouteSplit.length -1; i >= 0; i--) {
-                                    flippedAnotherRoute += anotherRouteSplit[i] + ",";
+                                    flippedAnotherRoute += anotherRouteSplit[i] + "-";
                                 }
 
                                 newRoute = flippedAnotherRoute + thisRoute;
@@ -315,7 +317,7 @@ public class Clarke {
                                 String flippedAnotherRoute = "";
                             
                                 for (int i = anotherRouteSplit.length -1; i >= 0; i--) {
-                                    flippedAnotherRoute += anotherRouteSplit[i] + ",";
+                                    flippedAnotherRoute += anotherRouteSplit[i] + "-";
                                 }
 
                                 newRoute += flippedAnotherRoute;
@@ -327,7 +329,7 @@ public class Clarke {
                                 String flippedThisRoute = "";
                             
                                 for (int i = thisRouteSplit.length -1; i >= 0; i--) {
-                                    flippedThisRoute += thisRouteSplit[i] + ",";
+                                    flippedThisRoute += thisRouteSplit[i] + "-";
                                 }
 
                                 newRoute = flippedThisRoute + anotherRoute;
@@ -337,7 +339,7 @@ public class Clarke {
                                 String flippedThisRoute = "";
                             
                                 for (int i = thisRouteSplit.length -1; i >= 0; i--) {
-                                    flippedThisRoute += thisRouteSplit[i] + ",";
+                                    flippedThisRoute += thisRouteSplit[i] + "-";
                                 }
                                 newRoute += flippedThisRoute;
                             }
@@ -347,9 +349,9 @@ public class Clarke {
                     else if ((thisRouteSplit[0].equals(thisItem) && anotherRouteSplit[anotherRouteSplit.length - 1].equals(anotherItem)) || (thisRouteSplit[thisRouteSplit.length - 1].equals(thisItem) && anotherRouteSplit[0].equals(anotherItem))) {
                         
                         if (thisRouteSplit[0].equals(thisItem)) { //if thisItem appears at the start of its route and anotherItem appears at the end, we have new route = another route + this route
-                            newRoute = anotherRoute + thisRoute;
+                            newRoute = anotherRoute + "-" + thisRoute;
                         } else {
-                            newRoute = thisRoute + anotherRoute;
+                            newRoute = thisRoute + "-" + anotherRoute;
                         }  
                     }
                 }
@@ -399,5 +401,52 @@ public class Clarke {
             }  
         }
         return finalRoutes;
+    }
+    
+    public HashMap<String, Integer> getDistanceOfFinalRoutes (ArrayList<String> pickingList, ArrayList<String> finalRoutes, String startingPoint) {
+        HashMap<String, Integer> finalRoutesDistHashMap = new HashMap<>();
+        ArrayList<HashMap> initialSolution = getInitialSolution(pickingList, startingPoint);
+        ArrayList<HashMap> ptToPtDistanceArr = getPointToPointDistance(pickingList);
+        
+        HashMap distFromStartPtToPickItem = initialSolution.get(0);
+        HashMap distFromPickItemToPickItem = ptToPtDistanceArr.get(0);
+        
+        for (String finalRoute : finalRoutes) {
+            String[] finalRouteSplit = finalRoute.split("-");
+            Integer thisRouteTotalDistance = 0; 
+            
+            if (finalRouteSplit.length >= 3) {
+                String startNodeToFirstPickNodeKey = finalRouteSplit[1];
+                
+                thisRouteTotalDistance += (Integer) distFromStartPtToPickItem.get(startNodeToFirstPickNodeKey);
+                
+                for (int i = 1; i < finalRouteSplit.length - 2; i++) {
+                    String thisNode = finalRouteSplit[i];
+                    String nextNode = finalRouteSplit[i+1];
+                    Integer xCoordOfThisNode = Integer.parseInt(thisNode.split(",")[0]);
+                    Integer xCoordOfNextNode = Integer.parseInt(nextNode.split(",")[0]);
+                    String thisPath = "";
+                    
+                    thisPath = thisNode + "to" + nextNode;
+                    
+                    if (distFromPickItemToPickItem.get(thisPath) != null) {
+                        thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(thisPath);
+                    } else {
+                        thisPath = nextNode + "to" + thisNode;
+                        thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(thisPath);
+                    }
+                    
+                }
+                
+               String lastPickNode = finalRouteSplit[finalRouteSplit.length - 2];
+               String lastNode = finalRouteSplit[finalRouteSplit.length - 1];
+               
+               thisRouteTotalDistance += (Integer.parseInt(lastNode.split(",")[1]) - Integer.parseInt(lastPickNode.split(",")[1]));
+               
+               finalRoutesDistHashMap.put(finalRoute, thisRouteTotalDistance);
+            }
+        }
+        
+        return finalRoutesDistHashMap;
     }
 }

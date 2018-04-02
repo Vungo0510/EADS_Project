@@ -154,7 +154,7 @@ public class EADSProject extends Application {
                     String[] startingPtSplit = startingPointText.getText().split(",");
                     if (startingPtSplit.length != 2) {
                         hasError = true;
-                        startingPointError.setText("Starting point has to be in the format d.d");
+                        startingPointError.setText("Starting point has to be in the format d,d");
                     }
                     
                     try {
@@ -222,6 +222,9 @@ public class EADSProject extends Application {
                         System.out.println(solutionMap);
                         System.out.println("Step 5b:");
                         System.out.println(finalRoutes);
+                        
+                        System.out.println("Final routes and distance:");
+                        System.out.println(c.getDistanceOfFinalRoutes(pickingList, finalRoutes, startingPointText.getText()));
                     } 
                 }
             });
