@@ -69,11 +69,20 @@ public class EADSProject extends Application {
       Text numOfMHEError = new Text();
       numOfMHEError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
       
+      //Label for starting point
+      Text startingPointLabel = new Text("Current MHE position"); 
+     
+      //Text field for num of MHE 
+      TextField startingPointText = new TextField(); 
+      
+      Text startingPointError = new Text();
+      startingPointError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
+      
       FileChooser fileChooser = new FileChooser();
       // Set extension filter
-    FileChooser.ExtensionFilter extFilter = 
+        FileChooser.ExtensionFilter extFilter = 
             new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
-    fileChooser.getExtensionFilters().add(extFilter);
+        fileChooser.getExtensionFilters().add(extFilter);
 
       
       //Label for picking list csv file chooser
@@ -117,7 +126,7 @@ public class EADSProject extends Application {
                 }
             });
       
-      //Label for register 
+      //Label for submit button 
       Button buttonSubmit = new Button("Submit");  
       
       buttonSubmit.setOnAction(
@@ -135,6 +144,25 @@ public class EADSProject extends Application {
                     if (cornerNodesFile == null) {
                         hasError = true;
                         cornerNodeError.setText("Corner node file is required");
+                    }
+                    
+                    if (startingPointText.getText().equals("")) {
+                        hasError = true;
+                        startingPointError.setText("Starting point is required");
+                    }
+                    
+                    String[] startingPtSplit = startingPointText.getText().split(",");
+                    if (startingPtSplit.length != 2) {
+                        hasError = true;
+                        startingPointError.setText("Starting point has to be in the format d.d");
+                    }
+                    
+                    try {
+                        Integer.parseInt(startingPtSplit[0]);
+                        Integer.parseInt(startingPtSplit[1]);
+                    } catch (NumberFormatException nfe) {
+                        hasError = true;
+                        mheCapacityError.setText("X and Y coordinate of starting point must be an integer");
                     }
                     
                     if (mheCapacityText.getText().equals("")) {
@@ -161,9 +189,7 @@ public class EADSProject extends Application {
                         mheCapacityError.setText("MHE capacity must be an integer");
                     }
                     
-                    if (hasError) {
-                        
-                    } else {
+                    if (!hasError) {
                         ArrayList<String> pickingList = csvReader.readPickingList(pickListFile.getAbsolutePath());
                         HashMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes(cornerNodesFile.getAbsolutePath());
                         HashMap<String, Integer> pickItemCapacityMap = csvReader.readPickItemCapacity(pickListFile.getAbsolutePath());
@@ -172,15 +198,15 @@ public class EADSProject extends Application {
 
                         Clarke c = new Clarke();
 
-                        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList);
+                        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList, startingPointText.getText());
                         HashMap<String, Integer> distOfStartPtToAllPt = intialSolution.get(0);
 
                         ArrayList<HashMap> ptToPtRouteAndDistanceArr = c.getPointToPointDistance(pickingList);
                         HashMap<String, Integer> distAmongPickItems = ptToPtRouteAndDistanceArr.get(0);
 
-                        HashMap<String, Integer> savingsMap = c.getSavingsMap(pickingList);
+                        HashMap<String, Integer> savingsMap = c.getSavingsMap(pickingList, startingPointText.getText());
 
-                        HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, 2.00);
+                        HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, Double.parseDouble(mheCapacityText.getText()), startingPointText.getText());
 
                         ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap);
 
@@ -204,7 +230,7 @@ public class EADSProject extends Application {
       GridPane gridPane = new GridPane();    
       
       //Setting size for the pane 
-      gridPane.setMinSize(600, 300); 
+      gridPane.setMinSize(600, 400); 
        
       //Setting the padding    
       gridPane.setPadding(new Insets(10, 10, 10, 10));  
@@ -225,18 +251,22 @@ public class EADSProject extends Application {
       gridPane.add(numOfMHELabel, 0, 2);       
       gridPane.add(numOfMHEText, 1, 2); 
       gridPane.add(numOfMHEError, 1, 3);
-              
-      gridPane.add(pickingListCSVLabel, 0, 4); 
-      gridPane.add(choosePickingListBtn, 1, 4); 
-      gridPane.add(pickListFileName, 2, 4);
-      gridPane.add(pickListError, 1, 5);
       
-      gridPane.add(cornerNodesCSVLabel, 0, 6); 
-      gridPane.add(chooseCornerNodesBtn, 1, 6); 
-      gridPane.add(cornerNodesFileName, 2, 6);
-      gridPane.add(cornerNodeError, 1, 7);
+      gridPane.add(startingPointLabel, 0, 4);       
+      gridPane.add(startingPointText, 1, 4); 
+      gridPane.add(startingPointError, 1, 5);
+              
+      gridPane.add(pickingListCSVLabel, 0, 6); 
+      gridPane.add(choosePickingListBtn, 1, 6); 
+      gridPane.add(pickListFileName, 2, 6);
+      gridPane.add(pickListError, 1, 7);
+      
+      gridPane.add(cornerNodesCSVLabel, 0, 8); 
+      gridPane.add(chooseCornerNodesBtn, 1, 8); 
+      gridPane.add(cornerNodesFileName, 2, 8);
+      gridPane.add(cornerNodeError, 1, 9);
        
-      gridPane.add(buttonSubmit, 2, 8);      
+      gridPane.add(buttonSubmit, 2, 10);      
       
       //Styling nodes   
       buttonSubmit.setStyle("-fx-background-color: \n" +
@@ -251,6 +281,7 @@ public class EADSProject extends Application {
       mheCapacityLabel.setStyle("-fx-font: normal bold 15px 'serif' ");
       mheCapacityUnitLabel.setStyle("-fx-font: normal 15px 'serif' ");
       numOfMHELabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
+      startingPointLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
       pickingListCSVLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
       cornerNodesCSVLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
        
@@ -261,7 +292,7 @@ public class EADSProject extends Application {
       Scene scene = new Scene(gridPane); 
       
       //Setting title to the Stage 
-      stage.setTitle("Registration Form"); 
+      stage.setTitle("Data Input Form"); 
          
       //Adding scene to the stage 
       stage.setScene(scene);  

@@ -13,12 +13,12 @@ import java.util.*;
  */
 public class Clarke {
 
-    private String startingPoint = "1,3"; //Store x,y coordinates of the starting point of the vehicle "x,y". To be passed in from UI
+    //private String startingPoint = "1,3"; //Store x,y coordinates of the starting point of the vehicle "x,y". To be passed in from UI
     private CSVReader csvReader = new CSVReader();    
     private HashMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes("./Data/CornerNodes.csv");
     
     //Step 1
-    public ArrayList<HashMap> getInitialSolution(ArrayList<String> pickingList) {
+    public ArrayList<HashMap> getInitialSolution(ArrayList<String> pickingList, String startingPoint) {
         // this method calculates the distance from starting pt to all pick nodes, pickingList passed in contains all the pick nodes
         HashMap<String, Integer> distOfStartPtToAllPt = new HashMap<String, Integer>(); //key stores x & y coordinates of pick nodes, values distance from start node to this pick node
         HashMap<String, String> routeOfStartPtToAllPt = new HashMap<String, String>();
@@ -113,10 +113,10 @@ public class Clarke {
     }
     
     //Step 3
-    public HashMap getSavingsMap(ArrayList<String> pickingList) {
+    public HashMap getSavingsMap(ArrayList<String> pickingList, String startingPoint) {
         HashMap<String, Integer> savingsMap = new HashMap<String, Integer>();
         
-        ArrayList<HashMap> intialSolution = getInitialSolution(pickingList);
+        ArrayList<HashMap> intialSolution = getInitialSolution(pickingList, startingPoint);
         HashMap<String, Integer> distOfStartPtToAllPt = intialSolution.get(0);
         
         ArrayList<HashMap> ptToPtRouteAndDistanceArr = getPointToPointDistance(pickingList);
@@ -178,7 +178,7 @@ public class Clarke {
     }
     
     //Step 4
-    public HashMap<String, String> getSolution(HashMap<String, Integer> pickItemCapacityMap, HashMap<String, Integer> savingsMap, Double mheCapacity) {
+    public HashMap<String, String> getSolution(HashMap<String, Integer> pickItemCapacityMap, HashMap<String, Integer> savingsMap, Double mheCapacity, String startingPoint) {
         HashMap<String, String> solutionMap = new HashMap<>(); 
         HashMap<String, Integer> capacityMap = new HashMap<>();
         

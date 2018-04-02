@@ -30,15 +30,15 @@ public class EADSProject_old {
         
         Clarke c = new Clarke();
         
-        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList);
+        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList, "1,3");
         HashMap<String, Integer> distOfStartPtToAllPt = intialSolution.get(0);
         
         ArrayList<HashMap> ptToPtRouteAndDistanceArr = c.getPointToPointDistance(pickingList);
         HashMap<String, Integer> distAmongPickItems = ptToPtRouteAndDistanceArr.get(0);
         
-        HashMap<String, Integer> savingsMap = c.getSavingsMap(pickingList);
+        HashMap<String, Integer> savingsMap = c.getSavingsMap(pickingList, "1,3");
         
-        HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, 2.00);
+        HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, 2.00, "1,3");
         
         ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap);
         
