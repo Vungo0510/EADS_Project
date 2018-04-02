@@ -13,7 +13,7 @@ import java.util.*;
 public class SubgraphDesign {
     
     private CSVReader csvReader = new CSVReader();
-    private HashMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes(); //contains the y coordinates of all the corner nodes with the same x coordinates. key is x coordinate
+    private HashMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes("./Data/CornerNodes.csv"); //contains the y coordinates of all the corner nodes with the same x coordinates. key is x coordinate
     
     public ArrayList<String> getPickingListCornerNodes(ArrayList<String> pickingList) {
         

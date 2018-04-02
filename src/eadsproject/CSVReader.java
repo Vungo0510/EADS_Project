@@ -19,9 +19,7 @@ import java.util.*;
 
 public class CSVReader {
 
-    public HashMap<Integer, ArrayList<Integer>> readAllCornerNodes() {
-
-        String csvFile = "./Data/CornerNodes.csv";
+    public HashMap<Integer, ArrayList<Integer>> readAllCornerNodes(String csvFile) {
         
         BufferedReader br = null;
         String line = "";

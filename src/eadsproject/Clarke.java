@@ -15,7 +15,7 @@ public class Clarke {
 
     private String startingPoint = "1,3"; //Store x,y coordinates of the starting point of the vehicle "x,y". To be passed in from UI
     private CSVReader csvReader = new CSVReader();    
-    private HashMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes();
+    private HashMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes("./Data/CornerNodes.csv");
     
     //Step 1
     public ArrayList<HashMap> getInitialSolution(ArrayList<String> pickingList) {
