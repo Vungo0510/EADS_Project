@@ -40,7 +40,7 @@ public class EADSProject_old {
         
         HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, 2.00, "1,3");
         
-        ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap);
+        ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap, "1,3");
         
         System.out.println("corner nodes: ");
         System.out.println(cornerNodesMap);

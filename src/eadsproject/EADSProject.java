@@ -208,7 +208,7 @@ public class EADSProject extends Application {
 
                         HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, Double.parseDouble(mheCapacityText.getText()), startingPointText.getText());
 
-                        ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap);
+                        ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap, startingPointText.getText());
 
                         System.out.println("corner nodes: ");
                         System.out.println(cornerNodesMap);

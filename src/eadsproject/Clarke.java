@@ -380,24 +380,37 @@ public class Clarke {
             String lastPickItem = thisRouteArr[thisRouteArr.length - 1];
             String lastPickItemXCoordinate = lastPickItem.split(",")[0];
             
-            solutionMap.put(thisKey, startingPoint + "-" + thisRoute + "-" + lastPickItemXCoordinate + ",1");
+            solutionMap.put(thisKey, thisRoute + "-" + lastPickItemXCoordinate + ",1");
         }
         return solutionMap;
     }
     
     //This method retrieves unique routes from solutionMap by iterating through them and compare the HashMap values
-    public ArrayList<String> getFinalRoutes (HashMap<String, String> solutionMap) {
+    public ArrayList<String> getFinalRoutes (HashMap<String, String> solutionMap, String startingPoint) {
         ArrayList<String> finalRoutes = new ArrayList<String>();
+        ArrayList<String> finalRoutesBeforeAddingStartPt = new ArrayList<String>();
         Set solutionMapKeySet = solutionMap.keySet();
         Iterator<String> keySetIter = solutionMapKeySet.iterator();
+        boolean isFirstRoute = true;
+        String lastNodeOfPrevRoute = "";
         
         while (keySetIter.hasNext()) { //iterate through all routes in solutionMap and add in the end node. End node has the same X coordinate as the last pick node and Y coordinate = 1
             String thisKey = keySetIter.next();
             String thisRoute = solutionMap.get(thisKey);
             String[] thisRouteSplit = thisRoute.split("-");
             
-            if(!finalRoutes.contains(thisRoute)) {
+            if(!finalRoutesBeforeAddingStartPt.contains(thisRoute)) {
+                finalRoutesBeforeAddingStartPt.add(thisRoute);
+                
+                if (isFirstRoute) {
+                    thisRoute = startingPoint + "-" + thisRoute;
+                } else {
+                    thisRoute = lastNodeOfPrevRoute + "-" + thisRoute;
+                }
+                
                 finalRoutes.add(thisRoute);
+                isFirstRoute = false;
+                lastNodeOfPrevRoute = thisRouteSplit[thisRouteSplit.length - 1];
             }  
         }
         return finalRoutes;
@@ -410,15 +423,37 @@ public class Clarke {
         
         HashMap distFromStartPtToPickItem = initialSolution.get(0);
         HashMap distFromPickItemToPickItem = ptToPtDistanceArr.get(0);
+        //boolean isFirstRoute = true;
+        //String lastNodeOfPrevRoute = "";
         
         for (String finalRoute : finalRoutes) {
+            /*if (isFirstRoute) {
+                finalRoute = startingPoint + "-" + finalRoute;
+            } else {
+                finalRoute = lastNodeOfPrevRoute + "-" + finalRoute;
+            }
+            
+            isFirstRoute = false;*/
             String[] finalRouteSplit = finalRoute.split("-");
             Integer thisRouteTotalDistance = 0; 
+            
+            System.out.println("this route: " + finalRoute);
             
             if (finalRouteSplit.length >= 3) {
                 String startNodeToFirstPickNodeKey = finalRouteSplit[1];
                 
-                thisRouteTotalDistance += (Integer) distFromStartPtToPickItem.get(startNodeToFirstPickNodeKey);
+                if (distFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) != null) {
+                    thisRouteTotalDistance += (Integer) distFromStartPtToPickItem.get(startNodeToFirstPickNodeKey);
+                
+                } else if (distFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]) != null) {
+                    thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]);
+                
+                } else if (distFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]) != null) {
+                    thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]);
+                }
+                for (String s : finalRouteSplit) {
+                    System.out.println(s);
+                }        
                 
                 for (int i = 1; i < finalRouteSplit.length - 2; i++) {
                     String thisNode = finalRouteSplit[i];
@@ -428,7 +463,6 @@ public class Clarke {
                     String thisPath = "";
                     
                     thisPath = thisNode + "to" + nextNode;
-                    
                     if (distFromPickItemToPickItem.get(thisPath) != null) {
                         thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(thisPath);
                     } else {
@@ -442,7 +476,8 @@ public class Clarke {
                String lastNode = finalRouteSplit[finalRouteSplit.length - 1];
                
                thisRouteTotalDistance += (Integer.parseInt(lastNode.split(",")[1]) - Integer.parseInt(lastPickNode.split(",")[1]));
-               
+               //lastNodeOfPrevRoute = lastNode;
+                       
                finalRoutesDistHashMap.put(finalRoute, thisRouteTotalDistance);
             }
         }
