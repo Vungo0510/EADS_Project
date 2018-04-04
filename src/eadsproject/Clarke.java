@@ -48,17 +48,41 @@ public class Clarke {
             => Assume that corner nodes (8, 1), (16, 1), (17, 1), (20,1) exist. (The items that correspond to each corner nodes are (8,17), (16,56), (17,47) and (20,58)
         */
         for (String s : pickingList) {
+            
             int xCoordinateOfPickItem = Integer.parseInt(s.split(",")[1]);
             int yCoordinateOfPickItem = Integer.parseInt(s.split(",")[2]);
             
-            //dist from start to pick item = dist from start to nearest corner node A with same x coordinate + dist from corner node A to corner node B with same y coordinate as A and x coordinate of pick item + dist from corner node B to pick item  
-            int distFromStartPtToPickItem = Math.abs(yCoordinateOfStartPt - yCoordNearestCornerToStartPt) + Math.abs(xCoordinateOfStartPt - xCoordinateOfPickItem) + Math.abs(yCoordNearestCornerToStartPt - yCoordinateOfPickItem);
-            
-            //key is x-y coordinate of the pick node, value is distance from start node to pick node
-            distOfStartPtToAllPt.put(xCoordinateOfPickItem + "," + yCoordinateOfPickItem, distFromStartPtToPickItem);
-            
-            //save the full route in case we need to retrieve later. Key is x-y coordinate of the pick node, value is the full route from start node to pick node
-            routeOfStartPtToAllPt.put(xCoordinateOfPickItem + "," + yCoordinateOfPickItem, xCoordinateOfStartPt + "," + yCoordinateOfStartPt + "-" + xCoordinateOfStartPt + "," + yCoordNearestCornerToStartPt + "-" + xCoordinateOfPickItem + "," + yCoordNearestCornerToStartPt + "-" + xCoordinateOfPickItem + "," + yCoordinateOfPickItem);
+            if (!startingPoint.equals(xCoordinateOfPickItem + "," + yCoordinateOfPickItem)) {
+                int distFromStartPtToPickItem = -1;
+
+                //if pick item and start point have the same X coordinate, just go straight to pick item
+                if (Math.abs(xCoordinateOfPickItem - xCoordinateOfStartPt) == 0) {
+
+                    //distance here is just the absolute difference of y coordinates between start node and pick node
+                    distFromStartPtToPickItem = Math.abs(yCoordinateOfStartPt - yCoordinateOfPickItem);
+
+                    //save the full route in case we need to retrieve later. Key is x-y coordinate of the pick node, value is the full route from start node to pick node
+                    routeOfStartPtToAllPt.put(xCoordinateOfPickItem + "," + yCoordinateOfPickItem, xCoordinateOfStartPt + "," + yCoordinateOfStartPt + "-" + xCoordinateOfPickItem + "," + yCoordinateOfPickItem);
+                } 
+                //if pick item and start point are on 2 adjacent X coordinates, turn left/right (hence the +1 in distance) and go straight to pick item 
+                else if (Math.abs(xCoordinateOfPickItem - xCoordinateOfStartPt) == 1) {
+
+                    //distance in this case = distance from start node to the node with adjacent X and same Y + distance from that node to pick node 
+                    distFromStartPtToPickItem = Math.abs(yCoordinateOfStartPt - yCoordinateOfPickItem) + 1;
+
+                    //save the full route in case we need to retrieve later. Key is x-y coordinate of the pick node, value is the full route from start node to pick node
+                    routeOfStartPtToAllPt.put(xCoordinateOfPickItem + "," + yCoordinateOfPickItem, xCoordinateOfStartPt + "," + yCoordinateOfStartPt + "-" + xCoordinateOfPickItem + "," + yCoordinateOfStartPt + "-" + xCoordinateOfPickItem + "," + yCoordinateOfPickItem);
+                } else {
+                    //dist from start to pick item = dist from start to nearest corner node A with same x coordinate + dist from corner node A to corner node B with same y coordinate as A and x coordinate of pick item + dist from corner node B to pick item  
+                    distFromStartPtToPickItem = Math.abs(yCoordinateOfStartPt - yCoordNearestCornerToStartPt) + Math.abs(xCoordinateOfStartPt - xCoordinateOfPickItem) + Math.abs(yCoordNearestCornerToStartPt - yCoordinateOfPickItem);
+
+                    //save the full route in case we need to retrieve later. Key is x-y coordinate of the pick node, value is the full route from start node to pick node
+                    routeOfStartPtToAllPt.put(xCoordinateOfPickItem + "," + yCoordinateOfPickItem, xCoordinateOfStartPt + "," + yCoordinateOfStartPt + "-" + xCoordinateOfStartPt + "," + yCoordNearestCornerToStartPt + "-" + xCoordinateOfPickItem + "," + yCoordNearestCornerToStartPt + "-" + xCoordinateOfPickItem + "," + yCoordinateOfPickItem);
+                }
+
+                //key is x-y coordinate of the pick node, value is distance from start node to pick node
+                distOfStartPtToAllPt.put(xCoordinateOfPickItem + "," + yCoordinateOfPickItem, distFromStartPtToPickItem);
+            }
         }
         initialSolution.add(distOfStartPtToAllPt);
         initialSolution.add(routeOfStartPtToAllPt);
@@ -100,16 +124,45 @@ public class Clarke {
             */
             for (int j = i + 1; j < pickingList.size(); j++) {
                 String otherPickNode = pickingList.get(j);
-
+                
                 int xCoordinateOfOtherPickNode = Integer.parseInt(otherPickNode.split(",")[1]);
                 int yCoordinateOfOtherPickNode = Integer.parseInt(otherPickNode.split(",")[2]);
                 
-                //dist from current pick node to other pick node = dist from current pick node to nearest corner node A with same x coordinate as current pick node + dist from corner node A to corner node B with same y coordinate as A and x coordinate of other pick item + dist from corner node B to other pick node
-                int distFromCurrentPickNodeToOtherPickNode = Math.abs(yCoordinateOfOtherPickNode - yCoordNearestCornerToCurrPickNode) + Math.abs(xCoordinateOfOtherPickNode - xCoordinateOfCurrentPickNode) + Math.abs(yCoordNearestCornerToCurrPickNode - yCoordinateOfCurrentPickNode);
-                distAmongPickItems.put(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode, distFromCurrentPickNodeToOtherPickNode);   
+                String otherPickNodeXAndY = xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode;
+                String thisPickNodeXAndY = xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode;
                 
-                //save the route so that we can use in local search later!
-                routeFromCurrPickNodeToOtherPickNode.put(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode, xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "-" + xCoordinateOfCurrentPickNode + "," + yCoordNearestCornerToCurrPickNode + "-" + xCoordinateOfOtherPickNode + "," + yCoordNearestCornerToCurrPickNode + "-" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode);
+                if (!otherPickNodeXAndY.equals(thisPickNodeXAndY)) {    
+                    int distFromCurrentPickNodeToOtherPickNode = -1;
+
+                    //if current pick node and other pick node have the same X coordinate, just go straight to other pick node
+                    if (Math.abs(xCoordinateOfOtherPickNode - xCoordinateOfCurrentPickNode) == 0) {
+
+                        //distance here is just the absolute difference of y coordinates between current pick node and other pick node
+                        distFromCurrentPickNodeToOtherPickNode = Math.abs(yCoordinateOfOtherPickNode - yCoordinateOfCurrentPickNode);
+
+                        //save the full route in case we need to retrieve later. Key is in format: x-y coordinate of current pick node + "to" + x-y coordinate of other pick node, value is the full route from current pick node to other pick node
+                        routeFromCurrPickNodeToOtherPickNode.put(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode, xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "-" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode);
+                    } 
+                    //if pick item and start point are on 2 adjacent X coordinates, turn left/right (hence the +1 in distance) and go straight to pick item 
+                    else if (Math.abs(xCoordinateOfOtherPickNode - xCoordinateOfCurrentPickNode) == 1) {
+
+                        //distance in this case = distance from current pick node to the node with adjacent X and same Y + distance from that node to other pick node 
+                        distFromCurrentPickNodeToOtherPickNode = Math.abs(yCoordinateOfOtherPickNode - yCoordinateOfCurrentPickNode) + 1;
+
+                        //save the full route in case we need to retrieve later. Key is x-y coordinate of the pick node, value is the full route from start node to pick node
+                        routeFromCurrPickNodeToOtherPickNode.put(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode, xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "-" + xCoordinateOfOtherPickNode + "," + yCoordinateOfCurrentPickNode + "-" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode);
+                    } else {
+                        //dist from current pick node to other pick node = dist from current pick node to nearest corner node A with same x coordinate as current pick node + dist from corner node A to corner node B with same y coordinate as A and x coordinate of other pick item + dist from corner node B to other pick node
+                        distFromCurrentPickNodeToOtherPickNode = Math.abs(yCoordinateOfOtherPickNode - yCoordNearestCornerToCurrPickNode) + Math.abs(xCoordinateOfOtherPickNode - xCoordinateOfCurrentPickNode) + Math.abs(yCoordNearestCornerToCurrPickNode - yCoordinateOfCurrentPickNode);
+
+                        //save the full route in case we need to retrieve later. Key is x-y coordinate of the pick node, value is the full route from start node to pick node
+                        routeFromCurrPickNodeToOtherPickNode.put(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode, xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "-" + xCoordinateOfCurrentPickNode + "," + yCoordNearestCornerToCurrPickNode + "-" + xCoordinateOfOtherPickNode + "," + yCoordNearestCornerToCurrPickNode + "-" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode);
+                    }
+
+                    distAmongPickItems.put(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode, distFromCurrentPickNodeToOtherPickNode);   
+
+                }
+                
             }
         }
         
@@ -139,14 +192,20 @@ public class Clarke {
 
                 int xCoordinateOfOtherPickNode = Integer.parseInt(otherPickNode.split(",")[1]);
                 int yCoordinateOfOtherPickNode = Integer.parseInt(otherPickNode.split(",")[2]);
+                
+                String otherPickNodeXAndY = xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode;
+                String thisPickNodeXAndY = xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode;
+                
+                if (!otherPickNodeXAndY.equals(thisPickNodeXAndY)) {  
+                    int distFromStartPtToNodei = distOfStartPtToAllPt.get(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode); //c0i
+                    int distFromStartPtToNodej = distOfStartPtToAllPt.get(xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode); //c0j
 
-                int distFromStartPtToNodei = distOfStartPtToAllPt.get(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode); //c0i
-                int distFromStartPtToNodej = distOfStartPtToAllPt.get(xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode); //c0j
-                int distFromNodeiToNodej = distAmongPickItems.get(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode);
+                    int distFromNodeiToNodej = distAmongPickItems.get(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode);
 
-                int savingsForEdgeij = distFromStartPtToNodei + distFromStartPtToNodej - distFromNodeiToNodej;
+                    int savingsForEdgeij = distFromStartPtToNodei + distFromStartPtToNodej - distFromNodeiToNodej;
 
-                savingsMap.put(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode, savingsForEdgeij);
+                    savingsMap.put(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode, savingsForEdgeij);
+                }
             }
         }
         
@@ -299,6 +358,9 @@ public class Clarke {
                 String newRoute = "";
                 Integer combinedCapacity = thisRouteCapacity + anotherRouteCapacity;
                 
+                //System.out.println(thisRoute);
+                //System.out.println(anotherRoute);
+                //System.out.println(thisItem + "----" + anotherItem);
                 //if thisItem and anotherItem belong to diff routes & if capacity of combined route doesn't exceed capacity limit
                 if (!thisRoute.equals(anotherRoute) && combinedCapacity <= mheCapacity) {
                     
@@ -315,6 +377,7 @@ public class Clarke {
                                 }
 
                                 newRoute = flippedAnotherRoute + thisRoute;
+                                
                             } else { //if thisItem and anotherItem are both last nodes in their routes, new route = this route + flipped route 
                                 newRoute = thisRoute;
                                 
@@ -325,6 +388,7 @@ public class Clarke {
                                 }
 
                                 newRoute += flippedAnotherRoute;
+                                
                             }
                             
                         } else { //if thisRoute is shorter than or as long as anotherRoute
@@ -337,6 +401,7 @@ public class Clarke {
                                 }
 
                                 newRoute = flippedThisRoute + anotherRoute;
+                                
                             } else { //if thisItem and anotherItem are both last nodes in their routes, new route = this route + flipped route 
                                 newRoute = anotherRoute;
                                 
@@ -345,7 +410,9 @@ public class Clarke {
                                 for (int i = thisRouteSplit.length -1; i >= 0; i--) {
                                     flippedThisRoute += thisRouteSplit[i] + "-";
                                 }
+                                
                                 newRoute += flippedThisRoute;
+                                
                             }
                         }
                     } 
@@ -426,7 +493,13 @@ public class Clarke {
         ArrayList<HashMap> ptToPtDistanceArr = getPointToPointDistance(pickingList, cornerNodeFilePath);
         
         HashMap distFromStartPtToPickItem = initialSolution.get(0);
+        HashMap routeFromStartPtToPickItem = initialSolution.get(1);
+        
         HashMap distFromPickItemToPickItem = ptToPtDistanceArr.get(0);
+        HashMap routeFromPickItemToPickItem = ptToPtDistanceArr.get(1);
+        
+        //System.out.println("route start to pick: " + routeFromStartPtToPickItem);
+        //System.out.println("route pick to pick: " + routeFromPickItemToPickItem);
         //boolean isFirstRoute = true;
         //String lastNodeOfPrevRoute = "";
         
@@ -448,12 +521,17 @@ public class Clarke {
                 
                 if (distFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) != null) {
                     thisRouteTotalDistance += (Integer) distFromStartPtToPickItem.get(startNodeToFirstPickNodeKey);
-                
+                    //System.out.println("Start: " + routeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey));
+                    System.out.println("start key: " + startNodeToFirstPickNodeKey + ", dist: " + distFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) + " --- total dist so far: " + thisRouteTotalDistance);
                 } else if (distFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]) != null) {
                     thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]);
-                
+                    //System.out.println("route detail: " + routeFromPickItemToPickItem.get(finalRouteSplit[0] + "to" + finalRouteSplit[1]));
+                    System.out.println("start key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", dist: " + distFromStartPtToPickItem.get(distFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1])) + " --- total dist so far: " + thisRouteTotalDistance);
+                    
                 } else if (distFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]) != null) {
                     thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]);
+                    //System.out.println("route detail: " + routeFromPickItemToPickItem.get(finalRouteSplit[1] + "to" + finalRouteSplit[0]));
+                    System.out.println("start key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", dist: " + distFromStartPtToPickItem.get(distFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0])) + " --- total dist so far: " + thisRouteTotalDistance);
                 }      
                 
                 for (int i = 1; i < finalRouteSplit.length - 2; i++) {
@@ -466,9 +544,11 @@ public class Clarke {
                     thisPath = thisNode + "to" + nextNode;
                     if (distFromPickItemToPickItem.get(thisPath) != null) {
                         thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(thisPath);
+                        System.out.println("route key: " + thisPath + ", dist: " + distFromPickItemToPickItem.get(thisPath) + " --- total dist so far: " + thisRouteTotalDistance);
                     } else {
                         thisPath = nextNode + "to" + thisNode;
                         thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(thisPath);
+                        System.out.println("route key: " + thisPath + ", dist: " + distFromPickItemToPickItem.get(thisPath) + " --- total dist so far: " + thisRouteTotalDistance);
                     }
                     
                 }
@@ -476,9 +556,10 @@ public class Clarke {
                String lastPickNode = finalRouteSplit[finalRouteSplit.length - 2];
                String lastNode = finalRouteSplit[finalRouteSplit.length - 1];
                
-               thisRouteTotalDistance += (Integer.parseInt(lastNode.split(",")[1]) - Integer.parseInt(lastPickNode.split(",")[1]));
+               thisRouteTotalDistance += Math.abs(Integer.parseInt(lastNode.split(",")[1]) - Integer.parseInt(lastPickNode.split(",")[1]));
                //lastNodeOfPrevRoute = lastNode;
-                       
+               //System.out.println("route " + finalRoute + " total dist: " + thisRouteTotalDistance); 
+               
                finalRoutesDistHashMap.put(finalRoute, thisRouteTotalDistance);
             }
         }
