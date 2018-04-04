@@ -11,8 +11,7 @@ package eadsproject;
  */
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.lang.NumberFormatException;
 
 import javafx.application.Application; 
@@ -191,27 +190,33 @@ public class EADSProject extends Application {
                     
                     if (!hasError) {
                         ArrayList<String> pickingList = csvReader.readPickingList(pickListFile.getAbsolutePath());
-                        HashMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes(cornerNodesFile.getAbsolutePath());
+                        TreeMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes(cornerNodesFile.getAbsolutePath());
                         HashMap<String, Integer> pickItemCapacityMap = csvReader.readPickItemCapacity(pickListFile.getAbsolutePath());
 
-                        System.out.println(pickingList);
+                        //System.out.println(pickingList);
 
                         Clarke c = new Clarke();
 
-                        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList, startingPointText.getText());
+                        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList, startingPointText.getText(), cornerNodesFile.getAbsolutePath());
                         HashMap<String, Integer> distOfStartPtToAllPt = intialSolution.get(0);
 
-                        ArrayList<HashMap> ptToPtRouteAndDistanceArr = c.getPointToPointDistance(pickingList);
+                        ArrayList<HashMap> ptToPtRouteAndDistanceArr = c.getPointToPointDistance(pickingList, cornerNodesFile.getAbsolutePath());
                         HashMap<String, Integer> distAmongPickItems = ptToPtRouteAndDistanceArr.get(0);
 
-                        HashMap<String, Integer> savingsMap = c.getSavingsMap(pickingList, startingPointText.getText());
+                        HashMap<String, Integer> savingsMap = c.getSavingsMap(pickingList, startingPointText.getText(), cornerNodesFile.getAbsolutePath());
 
                         HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, Double.parseDouble(mheCapacityText.getText()), startingPointText.getText());
 
                         ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap, startingPointText.getText());
-
-                        System.out.println("corner nodes: ");
-                        System.out.println(cornerNodesMap);
+                        
+                        SubgraphDesign subgraphDesign = new SubgraphDesign();
+                        ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
+                        HashMap<Integer, ArrayList<Integer>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
+                        
+                        TwiceAroundTheTree tatt = new TwiceAroundTheTree();
+                        
+                        //System.out.println("corner nodes: ");
+                        //System.out.println(cornerNodesMap);
                         System.out.println("Step 1: ");
                         System.out.println(distOfStartPtToAllPt);
                         System.out.println("Step 2: ");
@@ -224,7 +229,14 @@ public class EADSProject extends Application {
                         System.out.println(finalRoutes);
                         
                         System.out.println("Final routes and distance:");
-                        System.out.println(c.getDistanceOfFinalRoutes(pickingList, finalRoutes, startingPointText.getText()));
+                        System.out.println(c.getDistanceOfFinalRoutes(pickingList, finalRoutes, startingPointText.getText(), cornerNodesFile.getAbsolutePath()));
+                        
+                        System.out.println("Distance map for TATT:");
+                        HashMap sortedDistMap = tatt.getDistanceAmongNodes(subgraphMap, subgraphPartitioningResult);
+                        System.out.println(sortedDistMap);
+                        
+                        System.out.println("Minimum spanning map:");
+                        System.out.println(tatt.getMinimumSpanningMap(sortedDistMap, subgraphPartitioningResult));
                     } 
                 }
             });

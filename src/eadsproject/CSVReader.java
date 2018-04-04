@@ -19,7 +19,7 @@ import java.util.*;
 
 public class CSVReader {
 
-    public HashMap<Integer, ArrayList<Integer>> readAllCornerNodes(String csvFile) {
+    public TreeMap<Integer, ArrayList<Integer>> readAllCornerNodes(String csvFile) {
         
         BufferedReader br = null;
         String line = "";
@@ -38,16 +38,18 @@ public class CSVReader {
                 Integer cornerXCoordinate = Integer.parseInt(cornerToCorner[3]);
                 Integer cornerYCoordinate = Integer.parseInt(cornerToCorner[4]);
                 ArrayList<Integer> listOfYCoordinates = cornerNodesMap.get(cornerXCoordinate);
+                
                 if (listOfYCoordinates == null) {
                     listOfYCoordinates = new ArrayList<Integer>();
                     listOfYCoordinates.add(cornerYCoordinate);
-                    cornerNodesMap.put(cornerXCoordinate, listOfYCoordinates);
+                    
                 } else {                  
                     if (!listOfYCoordinates.contains(cornerYCoordinate)) {
                         listOfYCoordinates.add(cornerYCoordinate);
                     }
-                    cornerNodesMap.put(cornerXCoordinate, listOfYCoordinates);
                 }
+                
+                cornerNodesMap.put(cornerXCoordinate, listOfYCoordinates);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -62,14 +64,16 @@ public class CSVReader {
                 }
             }
         }
-        return cornerNodesMap;
+        
+        TreeMap<Integer, ArrayList<Integer>> cornerNodesTreeMap = new TreeMap<>(cornerNodesMap);
+        return cornerNodesTreeMap;
     }
     
     public ArrayList<String> readPickingList(String csvFile) {
 
         //String csvFile = "./Data/PickingList.csv"; //Already shifted to the correct position for ppl to walk on
        
-        File f = new File("./Data/PickingList.csv");
+        File f = new File(csvFile);
         System.out.println(f.getAbsolutePath());
         
         BufferedReader br = null;
@@ -117,7 +121,7 @@ public class CSVReader {
 
         //String csvFile = "./Data/PickingList.csv"; //Already shifted to the correct position for ppl to walk on
        
-        File f = new File("./Data/PickingList.csv");
+        File f = new File(csvFile);
         System.out.println(f.getAbsolutePath());
         
         BufferedReader br = null;

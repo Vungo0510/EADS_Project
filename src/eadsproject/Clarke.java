@@ -15,11 +15,13 @@ public class Clarke {
 
     //private String startingPoint = "1,3"; //Store x,y coordinates of the starting point of the vehicle "x,y". To be passed in from UI
     private CSVReader csvReader = new CSVReader();    
-    private HashMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes("./Data/CornerNodes.csv");
+    private TreeMap<Integer, ArrayList<Integer>> cornerNodesMap;
     
     //Step 1
-    public ArrayList<HashMap> getInitialSolution(ArrayList<String> pickingList, String startingPoint) {
+    public ArrayList<HashMap> getInitialSolution(ArrayList<String> pickingList, String startingPoint, String cornerNodeFilePath) {
         // this method calculates the distance from starting pt to all pick nodes, pickingList passed in contains all the pick nodes
+        cornerNodesMap = csvReader.readAllCornerNodes(cornerNodeFilePath);
+        
         HashMap<String, Integer> distOfStartPtToAllPt = new HashMap<String, Integer>(); //key stores x & y coordinates of pick nodes, values distance from start node to this pick node
         HashMap<String, String> routeOfStartPtToAllPt = new HashMap<String, String>();
         ArrayList<HashMap> initialSolution = new ArrayList<HashMap>();
@@ -64,8 +66,10 @@ public class Clarke {
     }
     
     //Step 2
-    public ArrayList<HashMap> getPointToPointDistance(ArrayList<String> pickingList) {
+    public ArrayList<HashMap> getPointToPointDistance(ArrayList<String> pickingList, String cornerNodeFilePath) {
         // this method calculates the distance from each pick node to all pick nodes, pickingList passed in contains all the pick nodes
+        cornerNodesMap = csvReader.readAllCornerNodes(cornerNodeFilePath);
+        
         HashMap<String, Integer> distAmongPickItems = new HashMap<String, Integer>(); //key is x,y coordinate of current pick node "to" x,y coordinate of other pick node. value is distance
         HashMap<String, String> routeFromCurrPickNodeToOtherPickNode = new HashMap<String, String>();
         ArrayList<HashMap> ptToPtRouteAndDistanceArr = new ArrayList<HashMap>();
@@ -115,13 +119,13 @@ public class Clarke {
     }
     
     //Step 3
-    public HashMap getSavingsMap(ArrayList<String> pickingList, String startingPoint) {
+    public HashMap getSavingsMap(ArrayList<String> pickingList, String startingPoint, String cornerNodeFilePath) {
         HashMap<String, Integer> savingsMap = new HashMap<String, Integer>();
         
-        ArrayList<HashMap> intialSolution = getInitialSolution(pickingList, startingPoint);
+        ArrayList<HashMap> intialSolution = getInitialSolution(pickingList, startingPoint, cornerNodeFilePath);
         HashMap<String, Integer> distOfStartPtToAllPt = intialSolution.get(0);
         
-        ArrayList<HashMap> ptToPtRouteAndDistanceArr = getPointToPointDistance(pickingList);
+        ArrayList<HashMap> ptToPtRouteAndDistanceArr = getPointToPointDistance(pickingList, cornerNodeFilePath);
         HashMap<String, Integer> distAmongPickItems = ptToPtRouteAndDistanceArr.get(0);
 
         for (int i = 0; i < pickingList.size(); i++) {
@@ -416,10 +420,10 @@ public class Clarke {
         return finalRoutes;
     }
     
-    public HashMap<String, Integer> getDistanceOfFinalRoutes (ArrayList<String> pickingList, ArrayList<String> finalRoutes, String startingPoint) {
+    public HashMap<String, Integer> getDistanceOfFinalRoutes (ArrayList<String> pickingList, ArrayList<String> finalRoutes, String startingPoint, String cornerNodeFilePath) {
         HashMap<String, Integer> finalRoutesDistHashMap = new HashMap<>();
-        ArrayList<HashMap> initialSolution = getInitialSolution(pickingList, startingPoint);
-        ArrayList<HashMap> ptToPtDistanceArr = getPointToPointDistance(pickingList);
+        ArrayList<HashMap> initialSolution = getInitialSolution(pickingList, startingPoint, cornerNodeFilePath);
+        ArrayList<HashMap> ptToPtDistanceArr = getPointToPointDistance(pickingList, cornerNodeFilePath);
         
         HashMap distFromStartPtToPickItem = initialSolution.get(0);
         HashMap distFromPickItemToPickItem = ptToPtDistanceArr.get(0);
@@ -437,7 +441,7 @@ public class Clarke {
             String[] finalRouteSplit = finalRoute.split("-");
             Integer thisRouteTotalDistance = 0; 
             
-            System.out.println("this route: " + finalRoute);
+            //System.out.println("this route: " + finalRoute);
             
             if (finalRouteSplit.length >= 3) {
                 String startNodeToFirstPickNodeKey = finalRouteSplit[1];
@@ -450,10 +454,7 @@ public class Clarke {
                 
                 } else if (distFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]) != null) {
                     thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]);
-                }
-                for (String s : finalRouteSplit) {
-                    System.out.println(s);
-                }        
+                }      
                 
                 for (int i = 1; i < finalRouteSplit.length - 2; i++) {
                     String thisNode = finalRouteSplit[i];
