@@ -522,16 +522,16 @@ public class Clarke {
                 if (distFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) != null) {
                     thisRouteTotalDistance += (Integer) distFromStartPtToPickItem.get(startNodeToFirstPickNodeKey);
                     //System.out.println("Start: " + routeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey));
-                    System.out.println("start key: " + startNodeToFirstPickNodeKey + ", dist: " + distFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) + " --- total dist so far: " + thisRouteTotalDistance);
+                    //System.out.println("start key: " + startNodeToFirstPickNodeKey + ", dist: " + distFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) + " --- total dist so far: " + thisRouteTotalDistance);
                 } else if (distFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]) != null) {
                     thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]);
                     //System.out.println("route detail: " + routeFromPickItemToPickItem.get(finalRouteSplit[0] + "to" + finalRouteSplit[1]));
-                    System.out.println("start key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", dist: " + distFromStartPtToPickItem.get(distFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1])) + " --- total dist so far: " + thisRouteTotalDistance);
+                    //System.out.println("start key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", dist: " + distFromStartPtToPickItem.get(distFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1])) + " --- total dist so far: " + thisRouteTotalDistance);
                     
                 } else if (distFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]) != null) {
                     thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]);
                     //System.out.println("route detail: " + routeFromPickItemToPickItem.get(finalRouteSplit[1] + "to" + finalRouteSplit[0]));
-                    System.out.println("start key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", dist: " + distFromStartPtToPickItem.get(distFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0])) + " --- total dist so far: " + thisRouteTotalDistance);
+                    //System.out.println("start key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", dist: " + distFromStartPtToPickItem.get(distFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0])) + " --- total dist so far: " + thisRouteTotalDistance);
                 }      
                 
                 for (int i = 1; i < finalRouteSplit.length - 2; i++) {
@@ -544,11 +544,11 @@ public class Clarke {
                     thisPath = thisNode + "to" + nextNode;
                     if (distFromPickItemToPickItem.get(thisPath) != null) {
                         thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(thisPath);
-                        System.out.println("route key: " + thisPath + ", dist: " + distFromPickItemToPickItem.get(thisPath) + " --- total dist so far: " + thisRouteTotalDistance);
+                        //System.out.println("route key: " + thisPath + ", dist: " + distFromPickItemToPickItem.get(thisPath) + " --- total dist so far: " + thisRouteTotalDistance);
                     } else {
                         thisPath = nextNode + "to" + thisNode;
                         thisRouteTotalDistance += (Integer) distFromPickItemToPickItem.get(thisPath);
-                        System.out.println("route key: " + thisPath + ", dist: " + distFromPickItemToPickItem.get(thisPath) + " --- total dist so far: " + thisRouteTotalDistance);
+                        //System.out.println("route key: " + thisPath + ", dist: " + distFromPickItemToPickItem.get(thisPath) + " --- total dist so far: " + thisRouteTotalDistance);
                     }
                     
                 }

@@ -19,8 +19,8 @@ public class TwiceAroundTheTree {
         ArrayList<String> cornerNodesWithinBorder = subgraphPartitioningResult.get(0);
         ArrayList<String> nodesWithinBorder = subgraphPartitioningResult.get(1);
         
-        System.out.println(subgraphMap);
-        System.out.println("CORNER NODES:" + cornerNodesWithinBorder);
+        //System.out.println(subgraphMap);
+        //System.out.println("CORNER NODES:" + cornerNodesWithinBorder);
         
         //this subgraph contains the corner nodes (after subgraph partitioning) and the pick item nodes
         Iterator<Integer> subGraphIter = subgraphMap.keySet().iterator();
@@ -28,7 +28,8 @@ public class TwiceAroundTheTree {
         int previousXCoord = -1;
         //int nearestHigherY = -1;
         
-        int distFromPreviousXToThisX = -1;
+        //set the distance to -2 so that it won't clash with the condition of Math.abs(distFromPreviousXToThisX) = 1 below
+        int distFromPreviousXToThisX = -2;
         int distFromThisYToNearestHigherY = -1;
         
         while(subGraphIter.hasNext()) {
@@ -46,15 +47,15 @@ public class TwiceAroundTheTree {
                 
                 //put the horizontal distance from (previous X coordinate, this Y coordinate) to (this X coordinate, this Y coordinate)
                 if (position != 0) {
-                    /*if ((previousXCoord + "," + yCoord).equals("17,58")) {
-                            System.out.println("ERRR: " + yCoordArrOfThisXCoord);
-                        }*/
-                    if (cornerNodesWithinBorder.contains(previousXCoord + "," + yCoord)) {
+                    
+                    //if (previous X coordinate, y coordinate) is a corner node OR if previous X and this X are adjacent, these 2 nodes are neighbors and thus their distance is eligible to be put in the map
+                    if (cornerNodesWithinBorder.contains(previousXCoord + "," + yCoord) || Math.abs(distFromPreviousXToThisX) == 1) {
                         distanceMap.put(previousXCoord + "," + yCoord + "-" + thisXCoord + "," + yCoord, distFromPreviousXToThisX);
                     }
                     
                     //if we are at the second highest Y coordinate, put in the distance from (previous X coordinate, highest Y coordinate) to (this X coordinate, highest Y coordinate) as well cos we won't be iterating through the highest Y coordinate
-                    if (i == yCoordArrOfThisXCoord.size() - 2 && cornerNodesWithinBorder.contains(previousXCoord + "," + nearestHigherYCoord)) {
+                    //we only do so if (previous X coordinate, y coordinate) is a corner node OR if previous X and this X are adjacent, these 2 nodes are neighbors and thus their distance is eligible to be put in the map
+                    if (i == yCoordArrOfThisXCoord.size() - 2 && (cornerNodesWithinBorder.contains(previousXCoord + "," + nearestHigherYCoord) || Math.abs(distFromPreviousXToThisX) == 1)) {
                         distanceMap.put(previousXCoord + "," + nearestHigherYCoord + "-" + thisXCoord + "," + nearestHigherYCoord, distFromPreviousXToThisX);
                     }
                 } 
@@ -107,12 +108,79 @@ public class TwiceAroundTheTree {
         
         ArrayList<String> cornerNodesWithinBorder = subgraphPartitioningResult.get(0);
         ArrayList<String> nodesWithinBorder = subgraphPartitioningResult.get(1);
+        ArrayList<String> originalNodesWithinBorder = new ArrayList<>(nodesWithinBorder);
         
-        while(distMapIterator.hasNext() && nodesWithinBorder.size() > 0) {
+        //An ArrayList that contains strings, with each string representing a "Tree". If 2 nodes appear in the same string it means that it's possible to reach one node from the other node
+        ArrayList<String> treesOfNodes = new ArrayList<String>();
+        
+        //boolean to check if any string ("tree") contains all nodes within the subgraph (corner nodes + pick nodes)
+        boolean treeWithAllNodesExist = false;
+        
+        while(distMapIterator.hasNext() && !treeWithAllNodesExist) {//nodesWithinBorder.size() > 0) {
             String thisPairOfNodes = (String) distMapIterator.next();
             String[] thisPairOfNodesArr = thisPairOfNodes.split("-");
             String thisNode = thisPairOfNodesArr[0];
             String anotherNode = thisPairOfNodesArr[1];
+            
+            int thisNodeArrIndex = -1;
+            int anotherNodeArrIndex = -1;
+            
+            for (int i = 0; i < treesOfNodes.size(); i++) {
+                String thisTree = treesOfNodes.get(i);
+                
+                int numberOfDash = 0;
+                for (int j = 0; j < thisTree.length(); j++) {
+                    if (thisTree.substring(j, j + 1).equals("-")) {
+                        numberOfDash++;
+                    }   
+                }
+                
+                if (numberOfDash == (originalNodesWithinBorder.size() - 1)) {
+                    //System.out.println("num of dash: " + numberOfDash);
+                    //System.out.println("num of nodes in total: " + originalNodesWithinBorder.size());
+                    treeWithAllNodesExist = true;
+                    break;
+                }
+                
+                if (thisTree.contains(thisNode)) {
+                    thisNodeArrIndex = i;
+                }
+                
+                if (thisTree.contains(anotherNode)) {
+                    anotherNodeArrIndex = i;
+                }
+            }
+            
+            if (thisNodeArrIndex == -1 && anotherNodeArrIndex == -1) { //if can't find both node, create a new tree in the array
+                
+                treesOfNodes.add(thisNode + "-" + anotherNode);
+                
+            } else if (thisNodeArrIndex == -1) { //if found another node but not this node, add this node to another node's tree
+                String anotherNodeTree = treesOfNodes.get(anotherNodeArrIndex);
+                anotherNodeTree += "-" + thisNode;
+                treesOfNodes.set(anotherNodeArrIndex, anotherNodeTree);
+                
+            } else if (anotherNodeArrIndex == -1) { //if found another node but not this node, add this node to another node's tree
+                String thisNodeTree = treesOfNodes.get(thisNodeArrIndex);
+                thisNodeTree += "-" + anotherNode;
+                treesOfNodes.set(thisNodeArrIndex, thisNodeTree);
+                
+            } else if (anotherNodeArrIndex != thisNodeArrIndex) { //if the 2 nodes belong to 2 different trees, merge them and keep the one with lower index
+                String thisNodeTree = treesOfNodes.get(thisNodeArrIndex);
+                String anotherNodeTree = treesOfNodes.get(anotherNodeArrIndex);
+                
+                if (anotherNodeArrIndex < thisNodeArrIndex) {
+                    anotherNodeTree += "-" + thisNodeTree;
+                    treesOfNodes.set(anotherNodeArrIndex, anotherNodeTree);
+                    treesOfNodes.remove(thisNodeArrIndex);
+                    
+                } else {
+                    thisNodeTree += "-" + anotherNodeTree;
+                    treesOfNodes.set(thisNodeArrIndex, thisNodeTree);
+                    treesOfNodes.remove(anotherNodeArrIndex);
+                }
+                
+            }
             
             Integer thisDist = sortedDistMap.get(thisPairOfNodes);
             ArrayList<String> thisNodeNeighborList = minimumSpanningMap.get(thisNode);
@@ -135,6 +203,50 @@ public class TwiceAroundTheTree {
             nodesWithinBorder.remove(thisNode);
             nodesWithinBorder.remove(anotherNode);
         } 
+        //System.out.println("Tree of nodes: " + treesOfNodes);
         return minimumSpanningMap;
+    }
+    
+    public ArrayList<String> getMinimumSpanningTree (HashMap<String,ArrayList<String>> minimumSpanningMap, String startingPoint) {
+        ArrayList<String> minimumSpanningTree = new ArrayList<>();
+        String[] nodesOfTreeArr = (String[]) minimumSpanningMap.keySet().toArray();
+        String[] originalNodesOfTreeArr = new String [nodesOfTreeArr.length];
+        originalNodesOfTreeArr = nodesOfTreeArr.clone();
+        
+        String[] startPtSplit = startingPoint.split(",");
+        
+        //find the corner node/pick node that is closest to starting point and let it be the tree's starting point
+        int startPtXCoord = Integer.parseInt(startPtSplit[0]);
+        int startPtYCoord = Integer.parseInt(startPtSplit[1]);
+        
+        int xCoordOfPtNearestToStartPt = Integer.MAX_VALUE;
+        int yCoordOfPtNearestToStartPt = Integer.MAX_VALUE;
+        
+        for (int i = 0; i < nodesOfTreeArr.length; i++) {
+            String[] thisNodeSplit = nodesOfTreeArr[i].split(",");
+            int thisNodeXCoord = Integer.parseInt(thisNodeSplit[0]);
+            int thisNodeYCoord = Integer.parseInt(thisNodeSplit[1]);
+            
+            if (Math.abs(thisNodeXCoord - startPtXCoord) <= Math.abs(xCoordOfPtNearestToStartPt - startPtXCoord)) {
+                
+                if (Math.abs(thisNodeYCoord - startPtYCoord) < Math.abs(yCoordOfPtNearestToStartPt - startPtYCoord)) {
+                    
+                    xCoordOfPtNearestToStartPt = thisNodeXCoord;
+                    yCoordOfPtNearestToStartPt = thisNodeYCoord;
+                }
+            }
+        }
+        
+        String ptNearestToStartPt = xCoordOfPtNearestToStartPt + "," + yCoordOfPtNearestToStartPt;
+        ArrayList<String> interimSol = new ArrayList<>();
+        minimumSpanningTree = recursiveDFSTraversal(originalNodesOfTreeArr, ptNearestToStartPt, interimSol);
+        return minimumSpanningTree;
+    }
+    
+    public ArrayList<String> recursiveDFSTraversal(String[] nodesOfTreeArr, String ptNearestToStartPt, ArrayList<String> interimSolution) {
+        while (nodesOfTreeArr.length > 0) {
+            
+        }
+        return interimSolution;
     }
 }
