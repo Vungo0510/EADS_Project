@@ -233,16 +233,20 @@ public class EADSProject extends Application {
                         
                         System.out.println("Local search routes and distance:");
                         LocalSearch ls = new LocalSearch();
-                        System.out.println(ls.localSearch(finalRoutes, pickingList , startingPointText.getText(), cornerNodesFile.getAbsolutePath()));
                         
-                        System.out.println("Distance map for TATT:");
+                        if (finalRoutes.size() <= 3) {
+                            System.out.println("local search result: "+ls.localSearch(finalRoutes, pickingList , startingPointText.getText(), cornerNodesFile.getAbsolutePath()));
+                        }
+                        
+                        
+                        //System.out.println("Distance map for TATT:");
                         HashMap sortedDistMap = tatt.getDistanceAmongNodes(subgraphMap, subgraphPartitioningResult);
-                        System.out.println(sortedDistMap);
+                        //System.out.println(sortedDistMap);
                         
-                        System.out.println("Minimum spanning map:");
+                        //System.out.println("Minimum spanning map:");
                         HashMap minSpanMap = tatt.getMinimumSpanningMap(sortedDistMap, subgraphPartitioningResult);
                         //System.out.println("size: " + minSpanMap.keySet().size());
-                        System.out.println(minSpanMap);
+                        //System.out.println(minSpanMap);
                     } 
                 }
             });

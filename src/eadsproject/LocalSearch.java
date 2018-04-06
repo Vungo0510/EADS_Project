@@ -41,7 +41,7 @@ public class LocalSearch {
             ArrayList<String> finalAns = new ArrayList<String>();
             
             String[] toKeepRoute = new String[finalRouteArr.length];
-            if(finalRouteArr.length <=20 && finalRouteArr.length>3 ){
+            if(finalRouteArr.length <=15 && finalRouteArr.length>3 ){
                 int totalSwap = finalRouteArr.length/2;
                 int noOfSwapSoFar = 0;
                 Random rand = new Random();
@@ -100,11 +100,26 @@ public class LocalSearch {
                         //finalAns = replicateFinalRouteArr;
                         finalRouteTotalDist = totalDist;
                         System.out.println(" stored j route: " );
+                        
+                        finalAns.clear();
+                        //finding the x and y coord of last pick node
+                        String lastPickNode = replicateFinalRouteArr[replicateFinalRouteArr.length-2];
+                        int ycoordOfLastPickNode = Integer.parseInt(lastPickNode.split(",")[1]);
+                        int xcoordOfLastPickNode = Integer.parseInt(lastPickNode.split(",")[0]);
+                        //changing the pack node to be of the same x coord of the last pick node, with y coord = 1
+                        String changePackNode = xcoordOfLastPickNode + ",1";
+                    
+                        
+                        int distFromLastPickNodeToPackNode = ycoordOfLastPickNode;
+                        
+                        
                         for(String s: replicateFinalRouteArr){
                             System.out.print(s + "  " );
                             finalAns.add(s);
                             
                         }
+                        finalAns.remove(finalAns.size()-1);
+                        finalAns.add(changePackNode);
                     
                     
                     }
@@ -132,7 +147,7 @@ public class LocalSearch {
                 
                 
             
-            }else if(finalRouteArr.length >20){
+            }else if(finalRouteArr.length >15){
             
                 int totalSwap = finalRouteArr.length/3;
                 int noOfSwapSoFar = 0;
@@ -182,11 +197,26 @@ public class LocalSearch {
                         //finalAns = replicateFinalRouteArr;
                         finalRouteTotalDist = totalDist;
                        // System.out.println(" stored j route: " );
+                        finalAns.clear();
+                           //finding the x and y coord of last pick node
+                        String lastPickNode = replicateFinalRouteArr[replicateFinalRouteArr.length-2];
+                        int ycoordOfLastPickNode = Integer.parseInt(lastPickNode.split(",")[1]);
+                        int xcoordOfLastPickNode = Integer.parseInt(lastPickNode.split(",")[0]);
+                        //changing the pack node to be of the same x coord of the last pick node, with y coord = 1
+                        String changePackNode = xcoordOfLastPickNode + ",1" ;
+                    
+                        
+                        int distFromLastPickNodeToPackNode = ycoordOfLastPickNode;
+                        
+                        
                         for(String s: replicateFinalRouteArr){
                             System.out.print(s + "  " );
                             finalAns.add(s);
                             
                         }
+                        finalAns.remove(finalAns.size()-1);
+                        finalAns.add(changePackNode);
+                    
                     
                     
                     } 
