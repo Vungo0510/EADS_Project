@@ -19,13 +19,13 @@ import java.util.*;
 
 public class CSVReader {
 
-    public TreeMap<Integer, ArrayList<Integer>> readAllCornerNodes(String csvFile) {
+    public TreeMap<Double, ArrayList<Double>> readAllCornerNodes(String csvFile) {
         
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";
         //System.out.println(csvFile);
-        HashMap<Integer, ArrayList<Integer>> cornerNodesMap = new HashMap<Integer, ArrayList<Integer>>();
+        HashMap<Double, ArrayList<Double>> cornerNodesMap = new HashMap<Double, ArrayList<Double>>();
         
         try {
             br = new BufferedReader(new FileReader(csvFile));
@@ -35,12 +35,12 @@ public class CSVReader {
 
                 // use comma as separator
                 String[] cornerToCorner = line.split(cvsSplitBy);
-                Integer cornerXCoordinate = Integer.parseInt(cornerToCorner[3]);
-                Integer cornerYCoordinate = Integer.parseInt(cornerToCorner[4]);
-                ArrayList<Integer> listOfYCoordinates = cornerNodesMap.get(cornerXCoordinate);
+                Double cornerXCoordinate = Double.parseDouble(cornerToCorner[3]);
+                Double cornerYCoordinate = Double.parseDouble(cornerToCorner[4]);
+                ArrayList<Double> listOfYCoordinates = cornerNodesMap.get(cornerXCoordinate);
                 
                 if (listOfYCoordinates == null) {
-                    listOfYCoordinates = new ArrayList<Integer>();
+                    listOfYCoordinates = new ArrayList<Double>();
                     listOfYCoordinates.add(cornerYCoordinate);
                     
                 } else {                  
@@ -65,7 +65,7 @@ public class CSVReader {
             }
         }
         
-        TreeMap<Integer, ArrayList<Integer>> cornerNodesTreeMap = new TreeMap<>(cornerNodesMap);
+        TreeMap<Double, ArrayList<Double>> cornerNodesTreeMap = new TreeMap<>(cornerNodesMap);
         return cornerNodesTreeMap;
     }
     
@@ -117,7 +117,7 @@ public class CSVReader {
         return pickingList;
     }
     
-    public HashMap<String, Integer> readPickItemCapacity (String csvFile) {
+    public HashMap<String, Double> readPickItemCapacity (String csvFile) {
 
         //String csvFile = "./Data/PickingList.csv"; //Already shifted to the correct position for ppl to walk on
        
@@ -128,7 +128,7 @@ public class CSVReader {
         String line = "";
         String cvsSplitBy = ",";
         //System.out.println(csvFile);
-        HashMap<String, Integer> pickItemCapacityMap = new HashMap<String, Integer>();
+        HashMap<String, Double> pickItemCapacityMap = new HashMap<String, Double>();
         
         try {
             br = new BufferedReader(new FileReader(csvFile));
@@ -138,15 +138,16 @@ public class CSVReader {
 
                 // use comma as separator
                 String[] pickItem = line.split(cvsSplitBy);
-                String xCoordinate = pickItem[4];
-                String yCoordinate = pickItem[5];
-                Integer numOfCartons = Integer.parseInt(pickItem[7]);
-                Integer existingCapacityAtPickLocation = pickItemCapacityMap.get(xCoordinate + "," + yCoordinate);
+                Double xCoordinate = Double.parseDouble(pickItem[4]);
+                Double yCoordinate = Double.parseDouble(pickItem[5]);
+                Double zCoordinate = Double.parseDouble(pickItem[6]);
+                Double numOfCartons = Double.parseDouble(pickItem[7]);
+                Double existingCapacityAtPickLocation = pickItemCapacityMap.get(xCoordinate + "," + yCoordinate + "," + zCoordinate);
                 
                 if (existingCapacityAtPickLocation == null) {
-                    pickItemCapacityMap.put(xCoordinate + "," + yCoordinate, numOfCartons);
+                    pickItemCapacityMap.put(xCoordinate + "," + yCoordinate + "," + zCoordinate, numOfCartons);
                 } else {
-                    pickItemCapacityMap.put(xCoordinate + "," + yCoordinate, existingCapacityAtPickLocation + numOfCartons);
+                    pickItemCapacityMap.put(xCoordinate + "," + yCoordinate + "," + zCoordinate, existingCapacityAtPickLocation + numOfCartons);
                 }
             }
         } catch (FileNotFoundException e) {

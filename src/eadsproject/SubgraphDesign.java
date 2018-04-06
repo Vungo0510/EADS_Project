@@ -13,7 +13,7 @@ import java.util.*;
 public class SubgraphDesign {
     
     private CSVReader csvReader = new CSVReader();
-    private TreeMap<Integer, ArrayList<Integer>> cornerNodesMap; //contains the y coordinates of all the corner nodes with the same x coordinates. key is x coordinate
+    private TreeMap<Double, ArrayList<Double>> cornerNodesMap; //contains the y coordinates of all the corner nodes with the same x coordinates. key is x coordinate
     
     public ArrayList<String> getPickingListCornerNodes(ArrayList<String> pickingList, String cornerNodeFilePath) {
         
@@ -26,11 +26,12 @@ public class SubgraphDesign {
             Integer pickItemXCoordinate = Integer.parseInt(pickItemArr[1]);
             Integer pickItemYCoordinate = Integer.parseInt(pickItemArr[2]);
       
-            ArrayList<Integer> allCornerNodesOfThisX = cornerNodesMap.get(pickItemXCoordinate); // retrieve the Y coordinates of all the corner nodes with the same x coordinates as the pick item
-            int belowCornerNodeY = -1;
-            int aboveConerNodeY = Integer.MAX_VALUE;
+            ArrayList<Double> allCornerNodesOfThisX = cornerNodesMap.get(pickItemXCoordinate); // retrieve the Y coordinates of all the corner nodes with the same x coordinates as the pick item
+            double belowCornerNodeY = -1.0;
+            double aboveConerNodeY = Integer.MAX_VALUE;
+            
             for (int j = 0; j < allCornerNodesOfThisX.size(); j++) {
-                Integer thisCornerNode = allCornerNodesOfThisX.get(j);
+                Double thisCornerNode = allCornerNodesOfThisX.get(j);
                 
                 if (thisCornerNode < pickItemYCoordinate) {
                     if (thisCornerNode > belowCornerNodeY) {
@@ -54,24 +55,24 @@ public class SubgraphDesign {
     public ArrayList<ArrayList<String>> subgraphPartitioning(ArrayList<String> pickingList, String cornerNodeFilePath) {
         
         cornerNodesMap = csvReader.readAllCornerNodes(cornerNodeFilePath);
-        ArrayList<Integer> boundaryList = getPickListBoundary(pickingList, cornerNodeFilePath);
-        Integer smallestX = boundaryList.get(0);
-        Integer smallestY = boundaryList.get(1);
-        Integer largestX = boundaryList.get(2);
-        Integer largestY = boundaryList.get(3);
+        ArrayList<Double> boundaryList = getPickListBoundary(pickingList, cornerNodeFilePath);
+        Double smallestX = boundaryList.get(0);
+        Double smallestY = boundaryList.get(1);
+        Double largestX = boundaryList.get(2);
+        Double largestY = boundaryList.get(3);
         
         ArrayList<ArrayList<String>> toReturn = new ArrayList<>();
         ArrayList<String> cornerNodesWithinBorder = new ArrayList<String>();  //cornerNodesWithinBorder is an ArrayList that stores all the corner nodes inside the subgraph
         
-        Iterator<Integer> cornerNodesIterator = cornerNodesMap.keySet().iterator();
+        Iterator<Double> cornerNodesIterator = cornerNodesMap.keySet().iterator();
         
         while (cornerNodesIterator.hasNext()) {
-            Integer cornerNodeX = cornerNodesIterator.next();
+            Double cornerNodeX = cornerNodesIterator.next();
             
             if (cornerNodeX >= smallestX && cornerNodeX <= largestX) {
-                ArrayList<Integer> cornerNodeY = cornerNodesMap.get(cornerNodeX);
+                ArrayList<Double> cornerNodeY = cornerNodesMap.get(cornerNodeX);
                 
-                for (Integer yCoordinate : cornerNodeY) {
+                for (Double yCoordinate : cornerNodeY) {
                     if (yCoordinate >= smallestY && yCoordinate <= largestY) {
                         cornerNodesWithinBorder.add(cornerNodeX + "," + yCoordinate);  //cornerNodesWithinBorder is an ArrayList that stores all the corner nodes and pick items inside the subgraph
                     }
@@ -107,19 +108,19 @@ public class SubgraphDesign {
     
     public HashMap getSubgraphMap(ArrayList<String> pickingList, String cornerNodeFilePath) {
         cornerNodesMap = csvReader.readAllCornerNodes(cornerNodeFilePath);
-        HashMap<Integer, ArrayList<Integer>> subgraphMap = new HashMap<>(cornerNodesMap);
+        HashMap<Double, ArrayList<Double>> subgraphMap = new HashMap<>(cornerNodesMap);
         
-        ArrayList<Integer> boundaryList = getPickListBoundary(pickingList, cornerNodeFilePath);
-        HashMap<Integer, ArrayList<Integer>> pickItemMap = new HashMap<>();
+        ArrayList<Double> boundaryList = getPickListBoundary(pickingList, cornerNodeFilePath);
+        HashMap<Double, ArrayList<Double>> pickItemMap = new HashMap<>();
         
         for (int i = 0; i < pickingList.size(); i++) {
             // adding pick items to a map with item's X coordinate as key and Y coordinate(s) as value(s)
             String pickItem = pickingList.get(i);
             String[] pickItemArr = pickItem.split(",");
-            Integer pickItemXCoordinate = Integer.parseInt(pickItemArr[1]);
-            Integer pickItemYCoordinate = Integer.parseInt(pickItemArr[2]);
+            Double pickItemXCoordinate = Double.parseDouble(pickItemArr[1]);
+            Double pickItemYCoordinate = Double.parseDouble(pickItemArr[2]);
             
-            ArrayList<Integer> pickItemYCoordArr = pickItemMap.get(pickItemXCoordinate);
+            ArrayList<Double> pickItemYCoordArr = pickItemMap.get(pickItemXCoordinate);
             
             if (pickItemYCoordArr == null) {
                 pickItemYCoordArr = new ArrayList<>();
@@ -132,28 +133,28 @@ public class SubgraphDesign {
             }
         }
         
-        Integer smallestX = boundaryList.get(0);
-        Integer smallestY = boundaryList.get(1);
-        Integer largestX = boundaryList.get(2);
-        Integer largestY = boundaryList.get(3);
+        Double smallestX = boundaryList.get(0);
+        Double smallestY = boundaryList.get(1);
+        Double largestX = boundaryList.get(2);
+        Double largestY = boundaryList.get(3);
         
-        Iterator<Integer> cornerNodesIterator = cornerNodesMap.keySet().iterator();
+        Iterator<Double> cornerNodesIterator = cornerNodesMap.keySet().iterator();
         
         while (cornerNodesIterator.hasNext()) {
-            Integer cornerNodeX = cornerNodesIterator.next();
+            Double cornerNodeX = cornerNodesIterator.next();
             if (cornerNodeX > largestX || cornerNodeX < smallestX) {
                 subgraphMap.remove(cornerNodeX);
             }
         }
         
-        Iterator<Integer> pickItemsIterator = pickItemMap.keySet().iterator();
+        Iterator<Double> pickItemsIterator = pickItemMap.keySet().iterator();
         
         while (pickItemsIterator.hasNext()) {
-            Integer pickItemXCoord = pickItemsIterator.next();
-            ArrayList<Integer> pickItemYCoordArr = pickItemMap.get(pickItemXCoord);
+            Double pickItemXCoord = pickItemsIterator.next();
+            ArrayList<Double> pickItemYCoordArr = pickItemMap.get(pickItemXCoord);
             
             //initially, this array only contains corner nodes's y coordinates for this x coordinates
-            ArrayList<Integer> nodesYCoordArr = subgraphMap.get(pickItemXCoord);
+            ArrayList<Double> nodesYCoordArr = subgraphMap.get(pickItemXCoord);
             
             //adding all pick items' y coordinate to the above array
             nodesYCoordArr.addAll(pickItemYCoordArr);
@@ -161,16 +162,16 @@ public class SubgraphDesign {
             subgraphMap.put(pickItemXCoord, nodesYCoordArr);
         }
         
-        Iterator<Integer> subgraphMapIterator = subgraphMap.keySet().iterator();
+        Iterator<Double> subgraphMapIterator = subgraphMap.keySet().iterator();
         
         while (subgraphMapIterator.hasNext()) {
             //node can be either an pick item or a corner node
-            Integer nodeXCoord = subgraphMapIterator.next();
-            ArrayList<Integer> nodesYCoordArr = subgraphMap.get(nodeXCoord);
+            Double nodeXCoord = subgraphMapIterator.next();
+            ArrayList<Double> nodesYCoordArr = subgraphMap.get(nodeXCoord);
         
-            nodesYCoordArr.sort(new Comparator<Integer>() {
-                    public int compare (Integer s1, Integer s2) {
-                        return s1 - s2;
+            nodesYCoordArr.sort(new Comparator<Double>() {
+                    public int compare (Double s1, Double s2) {
+                        return s1.intValue() - s2.intValue();
                     }
                 });
             
@@ -180,14 +181,14 @@ public class SubgraphDesign {
         return subgraphMap;
     }
     
-    public ArrayList<Integer> getPickListBoundary(ArrayList<String> pickingList, String cornerNodeFilePath) {
+    public ArrayList<Double> getPickListBoundary(ArrayList<String> pickingList, String cornerNodeFilePath) {
          //this method will return all the corner nodes found within the subgraph
-        ArrayList<Integer> boundaryList = new ArrayList<>();
+        ArrayList<Double> boundaryList = new ArrayList<>();
         ArrayList<String> pickListCornerNodes = getPickingListCornerNodes(pickingList, cornerNodeFilePath);
-        Integer largestX = -1;
-        Integer largestY = -1;
-        Integer smallestX = Integer.MAX_VALUE;
-        Integer smallestY = Integer.MAX_VALUE;
+        double largestX = -1;
+        double largestY = -1;
+        double smallestX = Integer.MAX_VALUE;
+        double smallestY = Integer.MAX_VALUE;
         
         for (int i = 0; i < pickListCornerNodes.size(); i++)  {
         //finding the 4 border corner nodes to draw the subgraph which contains all pick items

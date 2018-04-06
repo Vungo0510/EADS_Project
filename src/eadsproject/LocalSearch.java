@@ -15,23 +15,23 @@ import java.util.*;
 
 public class LocalSearch {
     
-    public HashMap<String, Integer> localSearch(ArrayList<String> finalRoutes, ArrayList<String> pickingList, String startingPoint, String cornerNodeFilePath){
+    public HashMap<String, Double> localSearch(ArrayList<String> finalRoutes, ArrayList<String> pickingList, String startingPoint, String cornerNodeFilePath, double mheTravelTime, double mheLiftingTime){
     
-        HashMap<String, Integer> modifiedRoutes = new HashMap<String, Integer>(); //to store all the routes after local search is completed
+        HashMap<String, Double> modifiedRoutes = new HashMap<String, Double>(); //to store all the routes after local search is completed
         Clarke c = new Clarke();
         // retrieve distance from start pt to all pt
-        ArrayList<HashMap> initialSolution = c.getInitialSolution(pickingList, startingPoint, cornerNodeFilePath);
-        HashMap<String, Integer> distOfStartPtToAllPt = initialSolution.get(0); //key stores x & y coordinates of pick nodes, values distance from start node to this pick node
+        ArrayList<HashMap> initialSolution = c.getInitialSolution(pickingList, startingPoint, cornerNodeFilePath, mheTravelTime, mheLiftingTime);
+        HashMap<String, Double> distOfStartPtToAllPt = initialSolution.get(0); //key stores x & y coordinates of pick nodes, values distance from start node to this pick node
         
-        ArrayList<HashMap> ptToPtRouteAndDistanceArr = c.getPointToPointDistance(pickingList,cornerNodeFilePath); 
-        HashMap<String, Integer> distAmongPickItems = ptToPtRouteAndDistanceArr.get(0); //key is x,y coordinate of current pick node "to" x,y coordinate of other pick node. value is distance
+        ArrayList<HashMap> ptToPtRouteAndDistanceArr = c.getPointToPointTime(pickingList,cornerNodeFilePath,mheTravelTime, mheLiftingTime); 
+        HashMap<String, Double> distAmongPickItems = ptToPtRouteAndDistanceArr.get(0); //key is x,y coordinate of current pick node "to" x,y coordinate of other pick node. value is distance
         
-        HashMap<String, Integer> finalRoutesDistHashMap = c.getDistanceOfFinalRoutes ( pickingList,finalRoutes, startingPoint,cornerNodeFilePath);
+        HashMap<String, Double> finalRoutesDistHashMap = c.getTimeOfFinalRoutes ( pickingList,finalRoutes, startingPoint, cornerNodeFilePath, mheTravelTime, mheLiftingTime);
         
         for(int i = 0; i < finalRoutes.size(); i++){
             // loop through the arrayList of finalRoutes to do local search on each route
             String finalRoute = finalRoutes.get(i);
-            int finalRouteTotalDist = finalRoutesDistHashMap.get(finalRoute);
+            double finalRouteTotalDist = finalRoutesDistHashMap.get(finalRoute);
             System.out.println(" finalRouteTotalDist " + finalRouteTotalDist);
             
             String[] finalRouteArr = finalRoute.split("-"); //first and last element are to be ignored: they are the starting position and packing position
@@ -65,7 +65,7 @@ public class LocalSearch {
                     
                     // calculate total dist of new route
                     int totalDist = 0;
-                    int distOfStartPtToFirstPickNode = distOfStartPtToAllPt.get(replicateFinalRouteArr[1]);
+                    double distOfStartPtToFirstPickNode = distOfStartPtToAllPt.get(replicateFinalRouteArr[1]);
                     totalDist += distOfStartPtToFirstPickNode;
                     
                     for(int k = 1; k<replicateFinalRouteArr.length-2; k++ ){
@@ -77,7 +77,7 @@ public class LocalSearch {
                         String pickNode2 = replicateFinalRouteArr[k+1];
                         System.out.println("pick node 2: " + pickNode2);
                         
-                        int distBetweenPickNodes = 0;
+                        double distBetweenPickNodes = 0;
                         if(distAmongPickItems.get(pickNode1 +"to" + pickNode2) !=null){
                             
                             distBetweenPickNodes = distAmongPickItems.get(pickNode1 +"to" + pickNode2);
@@ -104,13 +104,13 @@ public class LocalSearch {
                         finalAns.clear();
                         //finding the x and y coord of last pick node
                         String lastPickNode = replicateFinalRouteArr[replicateFinalRouteArr.length-2];
-                        int ycoordOfLastPickNode = Integer.parseInt(lastPickNode.split(",")[1]);
-                        int xcoordOfLastPickNode = Integer.parseInt(lastPickNode.split(",")[0]);
+                        double ycoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[1]);
+                        double xcoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[0]);
                         //changing the pack node to be of the same x coord of the last pick node, with y coord = 1
                         String changePackNode = xcoordOfLastPickNode + ",1";
                     
                         
-                        int distFromLastPickNodeToPackNode = ycoordOfLastPickNode;
+                        double distFromLastPickNodeToPackNode = ycoordOfLastPickNode;
                         
                         
                         for(String s: replicateFinalRouteArr){
@@ -168,15 +168,15 @@ public class LocalSearch {
                     replicateFinalRouteArr[secondPositionToSwap] = firstPositionToSwapStr;
                     
                     // calculate total dist of new route
-                    int totalDist = 0;
-                    int distOfStartPtToFirstPickNode = distOfStartPtToAllPt.get(replicateFinalRouteArr[1]);
+                    double totalDist = 0;
+                    double distOfStartPtToFirstPickNode = distOfStartPtToAllPt.get(replicateFinalRouteArr[1]);
                     totalDist += distOfStartPtToFirstPickNode;
                     
                     for(int k = 1; k<replicateFinalRouteArr.length-2; k++ ){
                         // find the distance of all the pick nodes in the routes all the way to the packing location
                         String pickNode1 = replicateFinalRouteArr[k];
                         String pickNode2 = replicateFinalRouteArr[k+1];
-                        int distBetweenPickNodes = 0;
+                        double distBetweenPickNodes = 0;
                         
                         if(distAmongPickItems.get(pickNode1 +"to" + pickNode2) !=null){
                             
@@ -200,13 +200,13 @@ public class LocalSearch {
                         finalAns.clear();
                            //finding the x and y coord of last pick node
                         String lastPickNode = replicateFinalRouteArr[replicateFinalRouteArr.length-2];
-                        int ycoordOfLastPickNode = Integer.parseInt(lastPickNode.split(",")[1]);
-                        int xcoordOfLastPickNode = Integer.parseInt(lastPickNode.split(",")[0]);
+                        double ycoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[1]);
+                        double xcoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[0]);
                         //changing the pack node to be of the same x coord of the last pick node, with y coord = 1
                         String changePackNode = xcoordOfLastPickNode + ",1" ;
                     
                         
-                        int distFromLastPickNodeToPackNode = ycoordOfLastPickNode;
+                        double distFromLastPickNodeToPackNode = ycoordOfLastPickNode;
                         
                         
                         for(String s: replicateFinalRouteArr){

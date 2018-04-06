@@ -22,21 +22,21 @@ public class EADSProject_old {
         String csvFile = "./Data/PickingList.csv";
         CSVReader csvReader = new CSVReader();
         ArrayList<String> pickingList = csvReader.readPickingList(csvFile);
-        TreeMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes("./Data/CornerNodes.csv");
-        HashMap<String, Integer> pickItemCapacityMap = csvReader.readPickItemCapacity(csvFile);
+        TreeMap<Double, ArrayList<Double>> cornerNodesMap = csvReader.readAllCornerNodes("./Data/CornerNodes.csv");
+        HashMap<String, Double> pickItemCapacityMap = csvReader.readPickItemCapacity(csvFile);
         //SubgraphDesign subgraphDesign = new SubgraphDesign();
         //System.out.println(subgraphDesign.getPickingListCornerNodes(pickingList));
         System.out.println(pickingList);
         
         Clarke c = new Clarke();
         
-        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList, "1,3", "./Data/CornerNodes.csv");
-        HashMap<String, Integer> distOfStartPtToAllPt = intialSolution.get(0);
+        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList, "1,3", "./Data/CornerNodes.csv", 0.25, 0.5);
+        HashMap<String, Double> distOfStartPtToAllPt = intialSolution.get(0);
         
-        ArrayList<HashMap> ptToPtRouteAndDistanceArr = c.getPointToPointDistance(pickingList, "./Data/CornerNodes.csv");
-        HashMap<String, Integer> distAmongPickItems = ptToPtRouteAndDistanceArr.get(0);
+        ArrayList<HashMap> ptToPtRouteAndDistanceArr = c.getPointToPointTime(pickingList, "./Data/CornerNodes.csv", 0.25, 0.5);
+        HashMap<String, Double> distAmongPickItems = ptToPtRouteAndDistanceArr.get(0);
         
-        HashMap<String, Integer> savingsMap = c.getSavingsMap(pickingList, "1,3", "./Data/CornerNodes.csv");
+        HashMap<String, Double> savingsMap = c.getSavingsMap(pickingList, "1,3", "./Data/CornerNodes.csv", 0.25, 0.5);
         
         HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, 2.00, "1,3");
         

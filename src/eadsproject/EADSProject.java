@@ -68,6 +68,24 @@ public class EADSProject extends Application {
       Text numOfMHEError = new Text();
       numOfMHEError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
       
+      //Label for num of MHE
+      Text mheTravelTimeLabel = new Text("Time taken for MHE to travel 1 meter"); 
+     
+      //Text field for num of MHE 
+      TextField mheTravelTimeText = new TextField(); 
+      
+      Text mheTravelTimeError = new Text();
+      numOfMHEError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
+      
+      //Label for num of MHE
+      Text mheLiftingTimeLabel = new Text("Time taken for MHE to lift/lower 1 meter"); 
+     
+      //Text field for num of MHE 
+      TextField mheLiftingTimeText = new TextField(); 
+      
+      Text mheLiftingTimeError = new Text();
+      mheLiftingTimeError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
+      
       //Label for starting point
       Text startingPointLabel = new Text("Current MHE position"); 
      
@@ -185,42 +203,66 @@ public class EADSProject extends Application {
                         Integer.parseInt(mheCapacityText.getText());
                     } catch (NumberFormatException nfe) {
                         hasError = true;
-                        mheCapacityError.setText("MHE capacity must be an integer");
+                        numOfMHEError.setText("MHE capacity must be an integer");
+                    }
+                    
+                    if (mheTravelTimeText.getText().equals("")) {
+                        hasError = true;
+                        mheTravelTimeError.setText("MHE travel time is required");
+                    }
+                    
+                    try {
+                        Double.parseDouble(mheCapacityText.getText());
+                    } catch (NumberFormatException nfe) {
+                        hasError = true;
+                        mheTravelTimeError.setText("MHE travel time must be a decimal");
+                    }
+                    
+                    if (mheLiftingTimeText.getText().equals("")) {
+                        hasError = true;
+                        mheLiftingTimeError.setText("MHE lifting time is required");
+                    }
+                    
+                    try {
+                        Double.parseDouble(mheLiftingTimeText.getText());
+                    } catch (NumberFormatException nfe) {
+                        hasError = true;
+                        mheLiftingTimeError.setText("MHE lifting time must be a number");
                     }
                     
                     if (!hasError) {
                         ArrayList<String> pickingList = csvReader.readPickingList(pickListFile.getAbsolutePath());
-                        TreeMap<Integer, ArrayList<Integer>> cornerNodesMap = csvReader.readAllCornerNodes(cornerNodesFile.getAbsolutePath());
-                        HashMap<String, Integer> pickItemCapacityMap = csvReader.readPickItemCapacity(pickListFile.getAbsolutePath());
+                        TreeMap<Double, ArrayList<Double>> cornerNodesMap = csvReader.readAllCornerNodes(cornerNodesFile.getAbsolutePath());
+                        HashMap<String, Double> pickItemCapacityMap = csvReader.readPickItemCapacity(pickListFile.getAbsolutePath());
 
                         //System.out.println(pickingList);
 
                         Clarke c = new Clarke();
 
-                        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList, startingPointText.getText(), cornerNodesFile.getAbsolutePath());
-                        HashMap<String, Integer> distOfStartPtToAllPt = intialSolution.get(0);
+                        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList, startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
+                        HashMap<String, Double> timeFromStartPtToAllPt = intialSolution.get(0);
 
-                        ArrayList<HashMap> ptToPtRouteAndDistanceArr = c.getPointToPointDistance(pickingList, cornerNodesFile.getAbsolutePath());
-                        HashMap<String, Integer> distAmongPickItems = ptToPtRouteAndDistanceArr.get(0);
+                        ArrayList<HashMap> ptToPtRouteAndTimeArr = c.getPointToPointTime(pickingList, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
+                        HashMap<String, Double> timeAmongPickItems = ptToPtRouteAndTimeArr.get(0);
 
-                        HashMap<String, Integer> savingsMap = c.getSavingsMap(pickingList, startingPointText.getText(), cornerNodesFile.getAbsolutePath());
+                        HashMap<String, Double> savingsMap = c.getSavingsMap(pickingList, startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
 
                         HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, Double.parseDouble(mheCapacityText.getText()), startingPointText.getText());
 
                         ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap, startingPointText.getText());
                         
                         SubgraphDesign subgraphDesign = new SubgraphDesign();
-                        ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
-                        HashMap<Integer, ArrayList<Integer>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
+                        //ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
+                        //HashMap<Integer, ArrayList<Integer>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
                         
                         TwiceAroundTheTree tatt = new TwiceAroundTheTree();
                         
                         //System.out.println("corner nodes: ");
                         //System.out.println(cornerNodesMap);
                         System.out.println("Step 1: ");
-                        System.out.println(distOfStartPtToAllPt);
+                        System.out.println(timeFromStartPtToAllPt);
                         System.out.println("Step 2: ");
-                        System.out.println(distAmongPickItems);
+                        System.out.println(timeAmongPickItems);
                         System.out.println("Step 3: ");
                         System.out.println(savingsMap);
                         System.out.println("Step 4 and 5:");
@@ -228,23 +270,23 @@ public class EADSProject extends Application {
                         System.out.println("Step 5b:");
                         System.out.println(finalRoutes);
                         
-                        System.out.println("Final routes and distance:");
-                        System.out.println(c.getDistanceOfFinalRoutes(pickingList, finalRoutes, startingPointText.getText(), cornerNodesFile.getAbsolutePath()));
+                        System.out.println("Final routes and time:");
+                        System.out.println(c.getTimeOfFinalRoutes(pickingList, finalRoutes, startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText())));
                         
-                        System.out.println("Local search routes and distance:");
+                        System.out.println("Local search routes and time:");
                         LocalSearch ls = new LocalSearch();
                         
                         if (finalRoutes.size() <= 3) {
-                            System.out.println("local search result: "+ls.localSearch(finalRoutes, pickingList , startingPointText.getText(), cornerNodesFile.getAbsolutePath()));
+                            System.out.println("local search result: "+ls.localSearch(finalRoutes, pickingList , startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText())));
                         }
                         
                         
-                        //System.out.println("Distance map for TATT:");
-                        HashMap sortedDistMap = tatt.getDistanceAmongNodes(subgraphMap, subgraphPartitioningResult);
-                        //System.out.println(sortedDistMap);
+                        //System.out.println("Time map for TATT:");
+                        //HashMap sortedTimeMap = tatt.getTimeAmongNodes(subgraphMap, subgraphPartitioningResult);
+                        //System.out.println(sortedTimeMap);
                         
                         //System.out.println("Minimum spanning map:");
-                        HashMap minSpanMap = tatt.getMinimumSpanningMap(sortedDistMap, subgraphPartitioningResult);
+                        //HashMap minSpanMap = tatt.getMinimumSpanningMap(sortedTimeMap, subgraphPartitioningResult);
                         //System.out.println("size: " + minSpanMap.keySet().size());
                         //System.out.println(minSpanMap);
                     } 
@@ -277,21 +319,30 @@ public class EADSProject extends Application {
       gridPane.add(numOfMHEText, 1, 2); 
       gridPane.add(numOfMHEError, 1, 3);
       
-      gridPane.add(startingPointLabel, 0, 4);       
-      gridPane.add(startingPointText, 1, 4); 
-      gridPane.add(startingPointError, 1, 5);
-              
-      gridPane.add(pickingListCSVLabel, 0, 6); 
-      gridPane.add(choosePickingListBtn, 1, 6); 
-      gridPane.add(pickListFileName, 2, 6);
-      gridPane.add(pickListError, 1, 7);
+      gridPane.add(mheTravelTimeLabel, 0, 4);       
+      gridPane.add(mheTravelTimeText, 1, 4); 
+      gridPane.add(mheTravelTimeError, 1, 5);
       
-      gridPane.add(cornerNodesCSVLabel, 0, 8); 
-      gridPane.add(chooseCornerNodesBtn, 1, 8); 
-      gridPane.add(cornerNodesFileName, 2, 8);
-      gridPane.add(cornerNodeError, 1, 9);
+      gridPane.add(mheLiftingTimeLabel, 0, 6);       
+      gridPane.add(mheLiftingTimeText, 1, 6); 
+      gridPane.add(mheLiftingTimeError, 1, 7);
+      
+      
+      gridPane.add(startingPointLabel, 0, 8);       
+      gridPane.add(startingPointText, 1, 8); 
+      gridPane.add(startingPointError, 1, 9);
+              
+      gridPane.add(pickingListCSVLabel, 0, 10); 
+      gridPane.add(choosePickingListBtn, 1, 10); 
+      gridPane.add(pickListFileName, 2, 10);
+      gridPane.add(pickListError, 1, 11);
+      
+      gridPane.add(cornerNodesCSVLabel, 0, 12); 
+      gridPane.add(chooseCornerNodesBtn, 1, 12); 
+      gridPane.add(cornerNodesFileName, 2, 12);
+      gridPane.add(cornerNodeError, 1, 13);
        
-      gridPane.add(buttonSubmit, 2, 10);      
+      gridPane.add(buttonSubmit, 2, 14);      
       
       //Styling nodes   
       buttonSubmit.setStyle("-fx-background-color: \n" +
@@ -306,6 +357,8 @@ public class EADSProject extends Application {
       mheCapacityLabel.setStyle("-fx-font: normal bold 15px 'serif' ");
       mheCapacityUnitLabel.setStyle("-fx-font: normal 15px 'serif' ");
       numOfMHELabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
+      mheTravelTimeLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
+      mheLiftingTimeLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
       startingPointLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
       pickingListCSVLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
       cornerNodesCSVLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
