@@ -23,12 +23,12 @@ public class SubgraphDesign {
         for (int i = 0; i < pickingList.size(); i++) {
             String pickItem = pickingList.get(i);
             String[] pickItemArr = pickItem.split(",");
-            Integer pickItemXCoordinate = Integer.parseInt(pickItemArr[1]);
-            Integer pickItemYCoordinate = Integer.parseInt(pickItemArr[2]);
+            Double pickItemXCoordinate = Double.parseDouble(pickItemArr[1]);
+            Double pickItemYCoordinate = Double.parseDouble(pickItemArr[2]);
       
             ArrayList<Double> allCornerNodesOfThisX = cornerNodesMap.get(pickItemXCoordinate); // retrieve the Y coordinates of all the corner nodes with the same x coordinates as the pick item
             double belowCornerNodeY = -1.0;
-            double aboveConerNodeY = Integer.MAX_VALUE;
+            double aboveConerNodeY = Double.MAX_VALUE;
             
             for (int j = 0; j < allCornerNodesOfThisX.size(); j++) {
                 Double thisCornerNode = allCornerNodesOfThisX.get(j);
@@ -87,8 +87,8 @@ public class SubgraphDesign {
             // Adding pick items' x and y coordinates into cornerNodesWithinBorder ArrayList
             String pickItem = pickingList.get(i);
             String[] pickItemArr = pickItem.split(",");
-            Integer pickItemXCoordinate = Integer.parseInt(pickItemArr[1]);
-            Integer pickItemYCoordinate = Integer.parseInt(pickItemArr[2]);
+            Double pickItemXCoordinate = Double.parseDouble(pickItemArr[1]);
+            Double pickItemYCoordinate = Double.parseDouble(pickItemArr[2]);
             
             if (!nodesWithinBorder.contains(pickItemXCoordinate + "," + pickItemYCoordinate)) {
                 nodesWithinBorder.add(pickItemXCoordinate + "," + pickItemYCoordinate);
@@ -187,15 +187,15 @@ public class SubgraphDesign {
         ArrayList<String> pickListCornerNodes = getPickingListCornerNodes(pickingList, cornerNodeFilePath);
         double largestX = -1;
         double largestY = -1;
-        double smallestX = Integer.MAX_VALUE;
-        double smallestY = Integer.MAX_VALUE;
+        double smallestX = Double.MAX_VALUE;
+        double smallestY = Double.MAX_VALUE;
         
         for (int i = 0; i < pickListCornerNodes.size(); i++)  {
         //finding the 4 border corner nodes to draw the subgraph which contains all pick items
             
             String[] thisCornerNode = pickListCornerNodes.get(i).split(",");
-            Integer cornerX = Integer.parseInt(thisCornerNode[0]);
-            Integer cornerY = Integer.parseInt(thisCornerNode[1]);
+            Double cornerX = Double.parseDouble(thisCornerNode[0]);
+            Double cornerY = Double.parseDouble(thisCornerNode[1]);
             
             if (largestX < cornerX) {
                 largestX = cornerX;

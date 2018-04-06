@@ -14,35 +14,34 @@ import java.util.*;
 public class TwiceAroundTheTree {
 
     //get the distance among all the nodes in subgraphMap. For each pair of node A and B with xA < xB OR yA < yB, ONLY STORES THE DISTANCE FROM A to B AND NOT B TO A
-    public HashMap<String, Integer> getDistanceAmongNodes(HashMap<Integer, ArrayList<Integer>> subgraphMap, ArrayList<ArrayList<String>> subgraphPartitioningResult) {
+    public HashMap<String, Double> getTimeAmongNodes(HashMap<Double, ArrayList<Double>> subgraphMap, ArrayList<ArrayList<String>> subgraphPartitioningResult) {
         //ArrayList<String> minimumSpanningTree = new ArrayList<>();
-        HashMap<String, Integer> distanceMap = new HashMap<>();
+        HashMap<String, Double> distanceMap = new HashMap<>();
         ArrayList<String> cornerNodesWithinBorder = subgraphPartitioningResult.get(0);
         ArrayList<String> nodesWithinBorder = subgraphPartitioningResult.get(1);
 
         //System.out.println(subgraphMap);
         //System.out.println("CORNER NODES:" + cornerNodesWithinBorder);
         //this subgraph contains the corner nodes (after subgraph partitioning) and the pick item nodes
-        Iterator<Integer> subGraphIter = subgraphMap.keySet().iterator();
+        Iterator<Double> subGraphIter = subgraphMap.keySet().iterator();
         int position = 0; //denote the index of element inside key set of this HashMap
-        int previousXCoord = -1;
-        //int nearestHigherY = -1;
+        double previousXCoord = -1;
 
         //set the distance to -2 so that it won't clash with the condition of Math.abs(distFromPreviousXToThisX) = 1 below
-        int distFromPreviousXToThisX = -2;
-        int distFromThisYToNearestHigherY = -1;
+        double distFromPreviousXToThisX = -2;
+        double distFromThisYToNearestHigherY = -1;
 
         while (subGraphIter.hasNext()) {
-            Integer thisXCoord = subGraphIter.next();
+            Double thisXCoord = subGraphIter.next();
             if (position != 0) {
                 distFromPreviousXToThisX = thisXCoord - previousXCoord;
             }
 
-            ArrayList<Integer> yCoordArrOfThisXCoord = subgraphMap.get(thisXCoord);
+            ArrayList<Double> yCoordArrOfThisXCoord = subgraphMap.get(thisXCoord);
 
             for (int i = 0; i < yCoordArrOfThisXCoord.size() - 1; i++) {
-                Integer yCoord = yCoordArrOfThisXCoord.get(i);
-                Integer nearestHigherYCoord = yCoordArrOfThisXCoord.get(i + 1);
+                Double yCoord = yCoordArrOfThisXCoord.get(i);
+                Double nearestHigherYCoord = yCoordArrOfThisXCoord.get(i + 1);
                 distFromThisYToNearestHigherY = nearestHigherYCoord - yCoord;
 
                 //put the horizontal distance from (previous X coordinate, this Y coordinate) to (this X coordinate, this Y coordinate)
@@ -68,27 +67,27 @@ public class TwiceAroundTheTree {
         }
 
         List<String> mapKeys = new ArrayList<>(distanceMap.keySet());
-        List<Integer> mapValues = new ArrayList<>(distanceMap.values());
+        List<Double> mapValues = new ArrayList<>(distanceMap.values());
 
         //sort distance map ascendingly
-        Collections.sort(mapValues, new Comparator<Integer>() {
+        Collections.sort(mapValues, new Comparator<Double>() {
             @Override
-            public int compare(Integer e1, Integer e2) {
-                return e1 - e2;
+            public int compare(Double e1, Double e2) {
+                return e1.intValue() - e2.intValue();
             }
         });
 
-        LinkedHashMap<String, Integer> sortedDistMap = new LinkedHashMap<>();
+        LinkedHashMap<String, Double> sortedDistMap = new LinkedHashMap<>();
 
-        Iterator<Integer> valueIterator = mapValues.iterator();
+        Iterator<Double> valueIterator = mapValues.iterator();
         while (valueIterator.hasNext()) {
-            Integer value = valueIterator.next();
+            Double value = valueIterator.next();
             Iterator<String> keyIterator = mapKeys.iterator();
 
             while (keyIterator.hasNext()) {
                 String key = keyIterator.next();
-                Integer originalDistance = distanceMap.get(key);
-                Integer sortedDistance = value;
+                Double originalDistance = distanceMap.get(key);
+                Double sortedDistance = value;
 
                 if (originalDistance == sortedDistance) {
                     keyIterator.remove();
@@ -102,7 +101,7 @@ public class TwiceAroundTheTree {
     }
 
     //get minimum spanning tree using Kruskal
-    public HashMap<String, ArrayList<String>> getMinimumSpanningMap(HashMap<String, Integer> sortedDistMap, ArrayList<ArrayList<String>> subgraphPartitioningResult) {
+    public HashMap<String, ArrayList<String>> getMinimumSpanningMap(HashMap<String, Double> sortedDistMap, ArrayList<ArrayList<String>> subgraphPartitioningResult) {
         HashMap<String, ArrayList<String>> minimumSpanningMap = new HashMap<>();
         Iterator distMapIterator = sortedDistMap.keySet().iterator();
 
@@ -182,7 +181,7 @@ public class TwiceAroundTheTree {
 
             }
 
-            Integer thisDist = sortedDistMap.get(thisPairOfNodes);
+            Double thisDist = sortedDistMap.get(thisPairOfNodes);
             ArrayList<String> thisNodeNeighborList = minimumSpanningMap.get(thisNode);
             ArrayList<String> anotherNodeNeighborList = minimumSpanningMap.get(anotherNode);
 
@@ -216,16 +215,16 @@ public class TwiceAroundTheTree {
         String[] startPtSplit = startingPoint.split(",");
 
         //find the corner node/pick node that is closest to starting point and let it be the tree's starting point
-        int startPtXCoord = Integer.parseInt(startPtSplit[0]);
-        int startPtYCoord = Integer.parseInt(startPtSplit[1]);
+        double startPtXCoord = Double.parseDouble(startPtSplit[0]);
+        double startPtYCoord = Double.parseDouble(startPtSplit[1]);
 
-        int xCoordOfPtNearestToStartPt = Integer.MAX_VALUE;
-        int yCoordOfPtNearestToStartPt = Integer.MAX_VALUE;
+        double xCoordOfPtNearestToStartPt = Integer.MAX_VALUE;
+        double yCoordOfPtNearestToStartPt = Integer.MAX_VALUE;
 
         for (int i = 0; i < nodesOfTreeArr.length; i++) {
             String[] thisNodeSplit = nodesOfTreeArr[i].split(",");
-            int thisNodeXCoord = Integer.parseInt(thisNodeSplit[0]);
-            int thisNodeYCoord = Integer.parseInt(thisNodeSplit[1]);
+            double thisNodeXCoord = Double.parseDouble(thisNodeSplit[0]);
+            double thisNodeYCoord = Double.parseDouble(thisNodeSplit[1]);
 
             if (Math.abs(thisNodeXCoord - startPtXCoord) <= Math.abs(xCoordOfPtNearestToStartPt - startPtXCoord)) {
 

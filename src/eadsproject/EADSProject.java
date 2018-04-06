@@ -252,8 +252,8 @@ public class EADSProject extends Application {
                         ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap, startingPointText.getText());
                         
                         SubgraphDesign subgraphDesign = new SubgraphDesign();
-                        //ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
-                        //HashMap<Integer, ArrayList<Integer>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
+                        ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
+                        HashMap<Double, ArrayList<Double>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
                         
                         TwiceAroundTheTree tatt = new TwiceAroundTheTree();
                         
@@ -281,14 +281,14 @@ public class EADSProject extends Application {
                         }
                         
                         
-                        //System.out.println("Time map for TATT:");
-                        //HashMap sortedTimeMap = tatt.getTimeAmongNodes(subgraphMap, subgraphPartitioningResult);
-                        //System.out.println(sortedTimeMap);
+                        System.out.println("Time map for TATT:");
+                        HashMap sortedTimeMap = tatt.getTimeAmongNodes(subgraphMap, subgraphPartitioningResult);
+                        System.out.println(sortedTimeMap);
                         
-                        //System.out.println("Minimum spanning map:");
-                        //HashMap minSpanMap = tatt.getMinimumSpanningMap(sortedTimeMap, subgraphPartitioningResult);
-                        //System.out.println("size: " + minSpanMap.keySet().size());
-                        //System.out.println(minSpanMap);
+                        System.out.println("Minimum spanning map:");
+                        HashMap minSpanMap = tatt.getMinimumSpanningMap(sortedTimeMap, subgraphPartitioningResult);
+                        System.out.println("size: " + minSpanMap.keySet().size());
+                        System.out.println(minSpanMap);
                     } 
                 }
             });
