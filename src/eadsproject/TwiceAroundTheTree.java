@@ -23,13 +23,15 @@ public class TwiceAroundTheTree {
         //System.out.println(subgraphMap);
         //System.out.println("CORNER NODES:" + cornerNodesWithinBorder);
         //this subgraph contains the corner nodes (after subgraph partitioning) and the pick item nodes
+        System.out.println("BRRR: ");
+        System.out.println(subgraphMap);
         Iterator<Double> subGraphIter = subgraphMap.keySet().iterator();
         int position = 0; //denote the index of element inside key set of this HashMap
-        double previousXCoord = -1;
+        double previousXCoord = -1.0;
 
         //set the distance to -2 so that it won't clash with the condition of Math.abs(distFromPreviousXToThisX) = 1 below
-        double distFromPreviousXToThisX = -2;
-        double distFromThisYToNearestHigherY = -1;
+        double distFromPreviousXToThisX = -2.0;
+        double distFromThisYToNearestHigherY = -1.0;
 
         while (subGraphIter.hasNext()) {
             Double thisXCoord = subGraphIter.next();

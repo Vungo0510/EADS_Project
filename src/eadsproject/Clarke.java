@@ -43,7 +43,7 @@ public class Clarke {
         //ArrayList of y coordinates corner nodes that have the same x as start pt
         ArrayList<Double> yCoordinatesOfCornerNodesNearStartPt = cornerNodesMap.get(xCoordinateOfStartPt);
         Double yCoordNearestCornerToStartPt = -1.0;
-        double currDiff = Integer.MAX_VALUE;
+        double currDiff = Double.MAX_VALUE;
         
         //Iterate through the ArrayList above and find the y coordinate that is nearest to start pt's y coordinate
         for (Double yCoordCornerPt : yCoordinatesOfCornerNodesNearStartPt) {
@@ -132,7 +132,7 @@ public class Clarke {
             //ArrayList of y coordinates corner nodes that have the same x as current pick node
             ArrayList<Double> yCoordinatesOfCornerNodesNearCurrPickNode = cornerNodesMap.get(xCoordinateOfCurrentPickNode);
             Double yCoordNearestCornerToCurrPickNode = -1.0;
-            double currDiff = Integer.MAX_VALUE;
+            double currDiff = Double.MAX_VALUE;
             
             //Iterate through the ArrayList above and find the y coordinate that is nearest to current pick node's y coordinate
             for (Double yCoordCornerPt : yCoordinatesOfCornerNodesNearCurrPickNode) {
@@ -173,7 +173,10 @@ public class Clarke {
                         
                         //time here is just the absolute difference of y coordinates between current pick node and other pick node and the sum of 2 z coordinates of 2 pick items (because we need to go down from z coordinate of item 1 to ground level, travel to item 2, then go up from ground level to z coordinate of item 2
                         timeFromCurrentPickNodeToOtherPickNode = (Math.abs(yCoordinateOfOtherPickNode - yCoordinateOfCurrentPickNode)*distOfOneUnitOfYCoordInMeters) * mheTravelTime + (zCoordinateOfOtherPickNode + zCoordinateOfCurrentPickNode) * mheLiftingTime;
-
+                        
+                        //if (yCoordinateOfCurrentPickNode == 58.0 || yCoordinateOfOtherPickNode == 59.0 && xCoordinateOfOtherPickNode == 20.0) {
+                        //    System.out.println("TEST: " + (Math.abs(yCoordinateOfOtherPickNode - yCoordinateOfCurrentPickNode)*distOfOneUnitOfYCoordInMeters + zCoordinateOfOtherPickNode + zCoordinateOfCurrentPickNode));
+                        //}
                         //save the full route in case we need to retrieve later. Key is in format: x-y-z coordinate of current pick node + "to" + x-y coordinate of other pick node, value is the full route from current pick node to other pick node
                         routeFromCurrPickNodeToOtherPickNode.put(xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "," + zCoordinateOfCurrentPickNode + "to" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode + "," + zCoordinateOfOtherPickNode, xCoordinateOfCurrentPickNode + "," + yCoordinateOfCurrentPickNode + "," + zCoordinateOfCurrentPickNode + "-" + xCoordinateOfOtherPickNode + "," + yCoordinateOfOtherPickNode + "," + zCoordinateOfOtherPickNode);
                     } 
@@ -549,7 +552,7 @@ public class Clarke {
         //System.out.println("route start to pick: " + routeFromStartPtToPickItem);
         //System.out.println("route pick to pick: " + routeFromPickItemToPickItem);
         //boolean isFirstRoute = true;
-        //String lastNodeOfPrevRoute = "";
+        String lastNodeOfPrevRoute = "";
         
         for (String finalRoute : finalRoutes) {
             /*if (isFirstRoute) {
@@ -565,23 +568,60 @@ public class Clarke {
             //System.out.println("this route: " + finalRoute);
             
             if (finalRouteSplit.length >= 3) {
-                String startNodeToFirstPickNodeKey = finalRouteSplit[1];
+                String startNodeToFirstPickNodeKey = "";
                 
-                if (timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) != null) {
-                    thisRouteTotalTime += (Double) timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey);
-                    //System.out.println("Start: " + routeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey));
-                    //System.out.println("start key: " + startNodeToFirstPickNodeKey + ", time: " + timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) + " --- total time so far: " + thisRouteTotalTime);
-                } else if (timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]) != null) {
-                    thisRouteTotalTime += (Double) timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]);
-                    //System.out.println("route detail: " + routeFromPickItemToPickItem.get(finalRouteSplit[0] + "to" + finalRouteSplit[1]));
-                    //System.out.println("start key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", time: " + timeFromStartPtToPickItem.get(timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1])) + " --- total time so far: " + thisRouteTotalTime);
+                //System.out.println("TRY: " + timeFromPickItemToPickItem);
+                boolean calculated = false;
+                
+                if (lastNodeOfPrevRoute.equals("")) {
+                    startNodeToFirstPickNodeKey = finalRouteSplit[1];
+                    if (timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) != null) {
+                        thisRouteTotalTime += (Double) timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey);
+                        //System.out.println("Start: " + routeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey));
+                        //System.out.println("start 1 key: " + startNodeToFirstPickNodeKey + ", time: " + timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) + " --- total time so far: " + thisRouteTotalTime);
+                    }
+                    calculated = true;
+                } else {
                     
-                } else if (timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]) != null) {
-                    thisRouteTotalTime += (Integer) timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]);
-                    //System.out.println("route detail: " + routeFromPickItemToPickItem.get(finalRouteSplit[1] + "to" + finalRouteSplit[0]));
-                    //System.out.println("start key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", time: " + timeFromStartPtToPickItem.get(timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0])) + " --- total time so far: " + thisRouteTotalTime);
-                }      
+                    //calculate time from start node to one pick node
+                    if (timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]) != null) {
+                        thisRouteTotalTime += (Double) timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]);
+                        //System.out.println("route detail: " + routeFromPickItemToPickItem.get(finalRouteSplit[0] + "to" + finalRouteSplit[1]));
+                        //System.out.println("start 2 key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", time: " + timeFromStartPtToPickItem.get(timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1])) + " --- total time so far: " + thisRouteTotalTime);
+                        calculated = true;
+                    } else if (timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]) != null) {
+                        thisRouteTotalTime += (Double) timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]);
+                        //System.out.println("route detail: " + routeFromPickItemToPickItem.get(finalRouteSplit[1] + "to" + finalRouteSplit[0]));
+                        //System.out.println("start 3 key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", time: " + timeFromStartPtToPickItem.get(timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0])) + " --- total time so far: " + thisRouteTotalTime);
+                        calculated = true;
+                    }
+                    /*if (!calculated) {
+                        System.out.println("Got here: " + finalRouteSplit[0] + "-" + finalRouteSplit[1]);
+                    }*/
+                }
+                if(!calculated) {
+                    
+                    
+                    String[] startNodeSplit = finalRouteSplit[0].split(",");
+                    String[] firstPickNodeSplit = finalRouteSplit[1].split(",");
+
+                    Double startNodeXCoord = Double.parseDouble(startNodeSplit[0]);
+                    Double firstPickNodeXCoord = Double.parseDouble(firstPickNodeSplit[0]);
+                    Double startNodeYCoord = Double.parseDouble(startNodeSplit[1]);
+                    Double firstPickNodeYCoord = Double.parseDouble(firstPickNodeSplit[1]);
+                    Double startNodeZCoord = Double.parseDouble(startNodeSplit[2]);
+                    Double firstPickNodeZCoord = Double.parseDouble(firstPickNodeSplit[2]);
+
+                    double distance = (Math.abs(startNodeXCoord - firstPickNodeXCoord)*distOfOneUnitOfXCoordInMeters + Math.abs(startNodeYCoord - firstPickNodeYCoord)*distOfOneUnitOfYCoordInMeters)*mheTravelTime + Math.abs(startNodeZCoord + firstPickNodeZCoord)*mheLiftingTime;
+                    //System.out.println("Distance: " + distance);
+                    
+                    thisRouteTotalTime += distance;
+                }
                 
+                
+                      
+                
+                //calculate time among intermediate nodes
                 for (int i = 1; i < finalRouteSplit.length - 2; i++) {
                     String thisNode = finalRouteSplit[i];
                     String nextNode = finalRouteSplit[i+1];
@@ -602,9 +642,17 @@ public class Clarke {
                 
                String lastPickNode = finalRouteSplit[finalRouteSplit.length - 2];
                String lastNode = finalRouteSplit[finalRouteSplit.length - 1];
+               Double lastPickNodeY = Double.parseDouble(lastPickNode.split(",")[1]);
+               Double lastPickNodeZ = Double.parseDouble(lastPickNode.split(",")[2]);
+               Double lastNodeY = Double.parseDouble(lastNode.split(",")[1]);
+               Double lastNodeZ = Double.parseDouble(lastNode.split(",")[2]);
                
-               thisRouteTotalTime += Math.abs(Double.parseDouble(lastNode.split(",")[1]) - Double.parseDouble(lastPickNode.split(",")[1]));
-               //lastNodeOfPrevRoute = lastNode;
+               lastNodeOfPrevRoute = lastNode;
+               
+               //System.out.println("time frm last pick node to last node: " + (Math.abs(lastPickNodeY - lastNodeY)*distOfOneUnitOfYCoordInMeters + Math.abs(lastPickNodeZ - lastNodeZ)));
+               thisRouteTotalTime += (Math.abs(lastPickNodeY - lastNodeY)*distOfOneUnitOfYCoordInMeters + Math.abs(lastPickNodeZ - lastNodeZ));
+               
+                //lastNodeOfPrevRoute = lastNode;
                //System.out.println("route " + finalRoute + " total time: " + thisRouteTotalTime); 
                
                finalRoutesDistHashMap.put(finalRoute, thisRouteTotalTime);

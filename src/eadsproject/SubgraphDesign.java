@@ -119,17 +119,18 @@ public class SubgraphDesign {
             String[] pickItemArr = pickItem.split(",");
             Double pickItemXCoordinate = Double.parseDouble(pickItemArr[1]);
             Double pickItemYCoordinate = Double.parseDouble(pickItemArr[2]);
+            Double pickItemZCoordinate = Double.parseDouble(pickItemArr[3]);
             
-            ArrayList<Double> pickItemYCoordArr = pickItemMap.get(pickItemXCoordinate);
+            ArrayList<Double> pickItemYZCoordArr = pickItemMap.get(pickItemXCoordinate);
             
-            if (pickItemYCoordArr == null) {
-                pickItemYCoordArr = new ArrayList<>();
+            if (pickItemYZCoordArr == null) {
+                pickItemYZCoordArr = new ArrayList<>();
             } 
             
             //if the array of all existing Y coordinates of pick items for this X coordinate doesn't contain the Y coordinate of this item, add it in the array
-            if (!pickItemYCoordArr.contains(pickItemYCoordinate)) {
-                pickItemYCoordArr.add(pickItemYCoordinate);
-                pickItemMap.put(pickItemXCoordinate, pickItemYCoordArr);
+            if (!pickItemYZCoordArr.contains(pickItemYCoordinate)) {
+                pickItemYZCoordArr.add(pickItemYCoordinate);
+                pickItemMap.put(pickItemXCoordinate, pickItemYZCoordArr);
             }
         }
         

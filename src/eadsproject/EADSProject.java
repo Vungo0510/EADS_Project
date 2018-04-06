@@ -251,11 +251,11 @@ public class EADSProject extends Application {
 
                         ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap, startingPointText.getText());
                         
-                        SubgraphDesign subgraphDesign = new SubgraphDesign();
-                        ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
-                        HashMap<Double, ArrayList<Double>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
+                        //SubgraphDesign subgraphDesign = new SubgraphDesign();
+                        //ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
+                        //HashMap<Double, ArrayList<Double>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
                         
-                        TwiceAroundTheTree tatt = new TwiceAroundTheTree();
+                        //TwiceAroundTheTree tatt = new TwiceAroundTheTree();
                         
                         //System.out.println("corner nodes: ");
                         //System.out.println(cornerNodesMap);
@@ -277,10 +277,10 @@ public class EADSProject extends Application {
                         LocalSearch ls = new LocalSearch();
                         
                         if (finalRoutes.size() <= 3) {
-                            System.out.println("local search result: "+ls.localSearch(finalRoutes, pickingList , startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText())));
+                        //    System.out.println("local search result: "+ls.localSearch(finalRoutes, pickingList , startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText())));
                         }
                         
-                        
+                        /*
                         System.out.println("Time map for TATT:");
                         HashMap sortedTimeMap = tatt.getTimeAmongNodes(subgraphMap, subgraphPartitioningResult);
                         System.out.println(sortedTimeMap);
@@ -289,6 +289,7 @@ public class EADSProject extends Application {
                         HashMap minSpanMap = tatt.getMinimumSpanningMap(sortedTimeMap, subgraphPartitioningResult);
                         System.out.println("size: " + minSpanMap.keySet().size());
                         System.out.println(minSpanMap);
+                        */
                     } 
                 }
             });
