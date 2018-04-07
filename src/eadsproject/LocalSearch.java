@@ -113,7 +113,7 @@ public class LocalSearch {
                          lastPickNode = replicateFinalRouteArr[replicateFinalRouteArr.length-2];
                         double xcoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[0]);
                         //changing the pack node to be of the same x coord of the last pick node, with y coord = 1
-                        String changePackNode = xcoordOfLastPickNode + ",1,0";
+                        String changePackNode = xcoordOfLastPickNode + ",1.0,0.0";
                                           
                         
                         for(String s: replicateFinalRouteArr){
@@ -136,6 +136,7 @@ public class LocalSearch {
                 String modifiedRouteStr = "";
                 if(i ==0){
                     String routeFromStartNodeToFirstPickNode = routeOfStartPtToAllPt.get( finalAns.get(1));
+                    routeFromStartNodeToFirstPickNode = routeFromStartNodeToFirstPickNode.substring(0, routeFromStartNodeToFirstPickNode.lastIndexOf("-"));
                     finalAnsWithCornerNodes +=routeFromStartNodeToFirstPickNode + "-";
                     for(int p = 1; p< finalAns.size()-2; p++){
                             String node = finalAns.get(p);
@@ -145,11 +146,12 @@ public class LocalSearch {
                             String intermediateRouteWithCornerNode = routeFromCurrPickNodeToOtherPickNode.get(node +"to" +nxtNode);
                             if(intermediateRouteWithCornerNode == null){
                                  intermediateRouteWithCornerNode = routeFromCurrPickNodeToOtherPickNode.get(nxtNode +"to" + node);
-                                 String[] intermediateRouteWithCornerNodeArr= intermediateRouteWithCornerNode.split(",");
+                                 String[] intermediateRouteWithCornerNodeArr= intermediateRouteWithCornerNode.split("-");
+                                 
                                  String routeIWant = "";
                                  for(int z = intermediateRouteWithCornerNodeArr.length-1; z >-1; z--){
                                      routeIWant += intermediateRouteWithCornerNodeArr[z];
-                                     routeIWant+=",";
+                                     routeIWant+="-";
                                      
                                  
                                  }
@@ -165,6 +167,8 @@ public class LocalSearch {
                                 System.out.println(intermediateRouteWithCornerNode + " intermediateRouteWithCornerNode ");
                                 int indexOfDash = intermediateRouteWithCornerNode.lastIndexOf("-");
                                 intermediateRouteWithCornerNode = intermediateRouteWithCornerNode.substring(0,indexOfDash+1);
+                                
+                                System.out.println(intermediateRouteWithCornerNode + " intermediateRouteWithCornerNode Aftercut");
                                 finalAnsWithCornerNodes +=intermediateRouteWithCornerNode;
                                 System.out.println(finalAnsWithCornerNodes + " finalAnsWithCornerNodes");
                                 modifiedRouteStr += node;
@@ -195,8 +199,8 @@ public class LocalSearch {
                     String xCoordOfFirstPickNode =firstPickNodeOfRoute2.split(",")[0];
                     String cornerNodeBetweenStartNodeAndFirstPickNode = xCoordOfFirstPickNode + ",1.0,0.0";
                     String firstInterMediateRoute = startNodeOfRoute2 + "-" + cornerNodeBetweenStartNodeAndFirstPickNode + "-";
+                    //routeFromStartNodeToFirstPickNode = routeFromStartNodeToFirstPickNode.substring(0, routeFromStartNodeToFirstPickNode.lastIndexOf("-"));
                     finalAnsWithCornerNodes +=firstInterMediateRoute;
-
                      for(int p = 1; p< finalAns.size()-2; p++){
                             String node = finalAns.get(p);
                             String nxtNode = finalAns.get(p+1);
@@ -204,11 +208,11 @@ public class LocalSearch {
                             
                             if(intermediateRouteWithCornerNode == null){
                                  intermediateRouteWithCornerNode = routeFromCurrPickNodeToOtherPickNode.get(nxtNode +"to" + node);
-                                 String[] intermediateRouteWithCornerNodeArr= intermediateRouteWithCornerNode.split(",");
+                                 String[] intermediateRouteWithCornerNodeArr= intermediateRouteWithCornerNode.split("-");
                                  String routeIWant = "";
                                  for(int z = intermediateRouteWithCornerNodeArr.length-1; z >=0; z--){
                                      routeIWant += intermediateRouteWithCornerNodeArr[z];
-                                     routeIWant+=",";
+                                     routeIWant+="-";
                                      
                                  
                                  }
