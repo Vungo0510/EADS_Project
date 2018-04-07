@@ -31,15 +31,23 @@ public class VisualisationResult {
         BorderPane borderPane = new BorderPane();
         Text text = new Text(); // creating this for the top of our border pane
         borderPane.setTop(text);
-        Text localSearchText = new Text();
+    
+      
         
         double textX = 0.0;
-        double textY = 0.0;
+        double textY = 10.0;
         
         Iterator modifiedRoutesKeySetIter = modifiedRoutes.keySet().iterator();
         
         //Creating a pane object  
         Pane centerPane = new Pane(); 
+        
+        Text localSearchText = new Text();
+        
+        Text titleText = new Text(textX, textY, "RESULTS: ");
+        
+        centerPane.getChildren().addAll(titleText);
+
         
         while (modifiedRoutesKeySetIter.hasNext()) {
             //textX +=100.0;
@@ -47,7 +55,8 @@ public class VisualisationResult {
             String thisModifiedRoute = (String) modifiedRoutesKeySetIter.next();
             double totalTimeInSecs = modifiedRoutes.get(thisModifiedRoute);
             localSearchText = new Text(textX, textY, "Route to take: " + thisModifiedRoute);
-            Text totalTimeInSecsText = new Text("Total time: " + Double.toString(totalTimeInSecs));
+            textY +=15.0;
+            Text totalTimeInSecsText = new Text(textX, textY, "Total time: " + Double.toString(totalTimeInSecs));
                  centerPane.getChildren().addAll(localSearchText);
                  centerPane.getChildren().addAll(totalTimeInSecsText);
 
