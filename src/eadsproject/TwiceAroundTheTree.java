@@ -12,14 +12,18 @@ import java.util.*;
  * @author Snow Petrel
  */
 public class TwiceAroundTheTree {
-
+    
+    private double distOfOneUnitOfYCoordInMeters = 0.9;
+    private double distOfOneUnitOfXCoordInMeters = 1.425;
+    
     //get the distance among all the nodes in subgraphMap. For each pair of node A and B with xA < xB OR yA < yB, ONLY STORES THE DISTANCE FROM A to B AND NOT B TO A
-    public HashMap<String, Double> getTimeAmongNodes(HashMap<Double, ArrayList<Double>> subgraphMap, ArrayList<ArrayList<String>> subgraphPartitioningResult) {
+    public HashMap<String, Double> getTimeAmongNodes(HashMap<Double, ArrayList<String>> subgraphMap, ArrayList<ArrayList<String>> subgraphPartitioningResult, double mheTravelTime, double mheLiftingTime) {
         //ArrayList<String> minimumSpanningTree = new ArrayList<>();
         HashMap<String, Double> distanceMap = new HashMap<>();
         ArrayList<String> cornerNodesWithinBorder = subgraphPartitioningResult.get(0);
         ArrayList<String> nodesWithinBorder = subgraphPartitioningResult.get(1);
-
+        HashMap<Double, ArrayList<Double>> zCoordinatesAtThisX = new HashMap<>();
+        
         //System.out.println(subgraphMap);
         //System.out.println("CORNER NODES:" + cornerNodesWithinBorder);
         //this subgraph contains the corner nodes (after subgraph partitioning) and the pick item nodes
@@ -28,43 +32,51 @@ public class TwiceAroundTheTree {
         Iterator<Double> subGraphIter = subgraphMap.keySet().iterator();
         int position = 0; //denote the index of element inside key set of this HashMap
         double previousXCoord = -1.0;
-
+        double previousZCoord = -1.0;
         //set the distance to -2 so that it won't clash with the condition of Math.abs(distFromPreviousXToThisX) = 1 below
         double distFromPreviousXToThisX = -2.0;
         double distFromThisYToNearestHigherY = -1.0;
+        double distFromThisZToNearestHigherZ = -1.0;
 
         while (subGraphIter.hasNext()) {
             Double thisXCoord = subGraphIter.next();
             if (position != 0) {
-                distFromPreviousXToThisX = thisXCoord - previousXCoord;
+                distFromPreviousXToThisX = (thisXCoord - previousXCoord) * distOfOneUnitOfXCoordInMeters * mheTravelTime;
             }
 
-            ArrayList<Double> yCoordArrOfThisXCoord = subgraphMap.get(thisXCoord);
+            ArrayList<String> yzCoordArrOfThisXCoord = subgraphMap.get(thisXCoord);
 
-            for (int i = 0; i < yCoordArrOfThisXCoord.size() - 1; i++) {
-                Double yCoord = yCoordArrOfThisXCoord.get(i);
-                Double nearestHigherYCoord = yCoordArrOfThisXCoord.get(i + 1);
-                distFromThisYToNearestHigherY = nearestHigherYCoord - yCoord;
+            for (int i = 0; i < yzCoordArrOfThisXCoord.size() - 1; i++) {
+                String yzCoord = yzCoordArrOfThisXCoord.get(i);
+                Double yCoord = Double.parseDouble(yzCoord.split(",")[0]);
+                Double zCoord = Double.parseDouble(yzCoord.split(",")[1]);
+                
+                String nearestHigherYZCoord = yzCoordArrOfThisXCoord.get(i + 1);
+                Double nearestHigherYCoord = Double.parseDouble(nearestHigherYZCoord.split(",")[0]);
+                Double nearestHigherZCoord = Double.parseDouble(nearestHigherYZCoord.split(",")[1]);
+                
+                distFromThisYZToNearestHigherYZ = ((nearestHigherYCoord - yCoord) * distOfOneUnitOfYCoordInMeters) * mheTravelTime + (zCoord + nearestHigherZCoord) * mheLiftingTime;
 
                 //put the horizontal distance from (previous X coordinate, this Y coordinate) to (this X coordinate, this Y coordinate)
                 if (position != 0) {
 
                     //if (previous X coordinate, y coordinate) is a corner node OR if previous X and this X are adjacent, these 2 nodes are neighbors and thus their distance is eligible to be put in the map
                     if (cornerNodesWithinBorder.contains(previousXCoord + "," + yCoord) || Math.abs(distFromPreviousXToThisX) == 1) {
-                        distanceMap.put(previousXCoord + "," + yCoord + "-" + thisXCoord + "," + yCoord, distFromPreviousXToThisX);
+                        distanceMap.put(previousXCoord + "," + yCoord + "," + zCoord + "-" + thisXCoord + "," + yCoord + "," + zCoord, distFromPreviousXToThisX);
                     }
 
                     //if we are at the second highest Y coordinate, put in the distance from (previous X coordinate, highest Y coordinate) to (this X coordinate, highest Y coordinate) as well cos we won't be iterating through the highest Y coordinate
                     //we only do so if (previous X coordinate, y coordinate) is a corner node OR if previous X and this X are adjacent, these 2 nodes are neighbors and thus their distance is eligible to be put in the map
-                    if (i == yCoordArrOfThisXCoord.size() - 2 && (cornerNodesWithinBorder.contains(previousXCoord + "," + nearestHigherYCoord) || Math.abs(distFromPreviousXToThisX) == 1)) {
+                    if (i == yzCoordArrOfThisXCoord.size() - 2 && (cornerNodesWithinBorder.contains(previousXCoord + "," + nearestHigherYCoord) || Math.abs(distFromPreviousXToThisX) == 1)) {
                         distanceMap.put(previousXCoord + "," + nearestHigherYCoord + "-" + thisXCoord + "," + nearestHigherYCoord, distFromPreviousXToThisX);
                     }
                 }
 
                 //put the vertical distance from (this X coordinate, this Y coordinate) to (this X coordinate, nearest higher Y coordinate)
-                distanceMap.put(thisXCoord + "," + yCoord + "-" + thisXCoord + "," + nearestHigherYCoord, distFromThisYToNearestHigherY);
+                distanceMap.put(thisXCoord + "," + yCoord + "-" + thisXCoord + "," + nearestHigherYCoord, distFromThisYZToNearestHigherYZ);
             }
             previousXCoord = thisXCoord;
+            //previousZCoord = zCoord;
             position++;
         }
 
