@@ -9,7 +9,7 @@ package eadsproject;
  *
  * @author Cathy
  */
-import java.util.HashMap;
+import java.util.*;
 import javafx.application.Application; 
 import javafx.scene.Group; 
 import javafx.scene.layout.BorderPane;
@@ -31,22 +31,42 @@ public class VisualisationResult {
         BorderPane borderPane = new BorderPane();
         Text text = new Text(); // creating this for the top of our border pane
         borderPane.setTop(text);
+        Text localSearchText = new Text();
+        
+        double textX = 0.0;
+        double textY = 0.0;
+        
+        Iterator modifiedRoutesKeySetIter = modifiedRoutes.keySet().iterator();
         
         //Creating a pane object  
         Pane centerPane = new Pane(); 
+        
+        while (modifiedRoutesKeySetIter.hasNext()) {
+            //textX +=100.0;
+            textY +=30.0;
+            String thisModifiedRoute = (String) modifiedRoutesKeySetIter.next();
+            double totalTimeInSecs = modifiedRoutes.get(thisModifiedRoute);
+            localSearchText = new Text(textX, textY, "Route to take: " + thisModifiedRoute);
+            Text totalTimeInSecsText = new Text("Total time: " + Double.toString(totalTimeInSecs));
+                 centerPane.getChildren().addAll(localSearchText);
+                 centerPane.getChildren().addAll(totalTimeInSecsText);
+
+           // hbox.getChildren().addAll(localSearchText, totalTimeInSecsText);
+        }
+        
+        
+        
         borderPane.setCenter(centerPane);
         
         //Creating horizontal box
         HBox hbox = new HBox();
-        double totalTimeInSecs = modifiedRoutes.get("1.0,4.0,0.0-20.0,58.0,5.1-16.0,56.0,2.1-17.0,47.0,6.1-8.0,50.0,2.1-8.0,17.0,2.1-8.0,1,0");
+       
         
-        Text localSearchText = new Text("Route to take: " + modifiedRoutes.toString());
-        Text totalTimeInSecsText = new Text("Total time: " + Double.toString(totalTimeInSecs));
-        hbox.getChildren().addAll(localSearchText, totalTimeInSecsText);
+       
         borderPane.setBottom(hbox);
         
         //creating a scene object
-        Scene scene = new Scene(borderPane, 800, 800);
+        Scene scene = new Scene(borderPane, 1400, 800);
        
         //Creating a Path 
         Path path = new Path(); 
