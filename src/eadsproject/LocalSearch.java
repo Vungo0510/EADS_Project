@@ -67,6 +67,7 @@ public class LocalSearch {
                     double totalDist = 0.0;
                     double distOfStartPtToFirstPickNode = distOfStartPtToAllPt.get(replicateFinalRouteArr[1]);
                     totalDist += distOfStartPtToFirstPickNode;
+                   
                     
                     for(int k = 1; k<replicateFinalRouteArr.length-2; k++ ){
                         // find the distance of all the pick nodes in the routes all the way to the packing location in the route that has finished swapping 2 pick items
@@ -92,7 +93,11 @@ public class LocalSearch {
                       
                     
                     }
-                
+                     // adding in the z coord distance of the last pick node into the total distance
+                    String lastPickNode = replicateFinalRouteArr[replicateFinalRouteArr.length-2];
+                    double zcoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[2]);
+                    totalDist +=zcoordOfLastPickNode ;
+                 
                    
                     
                     if(totalDist < finalRouteTotalDist){
@@ -103,15 +108,11 @@ public class LocalSearch {
                         
                         finalAns.clear();
                         //finding the x and y coord of last pick node
-                        String lastPickNode = replicateFinalRouteArr[replicateFinalRouteArr.length-2];
-                        double ycoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[1]);
+                         lastPickNode = replicateFinalRouteArr[replicateFinalRouteArr.length-2];
                         double xcoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[0]);
                         //changing the pack node to be of the same x coord of the last pick node, with y coord = 1
-                        String changePackNode = xcoordOfLastPickNode + ",1";
-                    
-                        
-                        double distFromLastPickNodeToPackNode = ycoordOfLastPickNode;
-                        
+                        String changePackNode = xcoordOfLastPickNode + ",1,0";
+                                          
                         
                         for(String s: replicateFinalRouteArr){
                             System.out.print(s + "  " );
@@ -127,12 +128,8 @@ public class LocalSearch {
                     
                 
                 }
-             /**   String modifiedRouteAns = "";
-                for(String s: modifiedRouteArr){
-                        modifiedRouteAns +=s + "";
-                }**/
+
              
-           //  System.out.println(" outside ");
              String modifiedRouteStr = "";
                 for(int p = 0; p< finalAns.size(); p++){
                             String node = finalAns.get(p);
@@ -142,10 +139,8 @@ public class LocalSearch {
                             }
                             
                 }
-               // String modifiedRouteStr = String.join("-", finalAns);
                 modifiedRoutes.put(modifiedRouteStr,finalRouteTotalDist);
-                
-                
+                               
             
             }else if(finalRouteArr.length >15){
             
@@ -190,6 +185,10 @@ public class LocalSearch {
                         totalDist +=distBetweenPickNodes;
                     
                     }
+                    // adding in the z coord distance of the last pick node into the total distance
+                    String lastPickNode = replicateFinalRouteArr[replicateFinalRouteArr.length-2];
+                    double zcoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[2]);
+                    totalDist +=zcoordOfLastPickNode ;
                  
                     
                     if(totalDist < finalRouteTotalDist){
@@ -199,15 +198,11 @@ public class LocalSearch {
                        // System.out.println(" stored j route: " );
                         finalAns.clear();
                            //finding the x and y coord of last pick node
-                        String lastPickNode = replicateFinalRouteArr[replicateFinalRouteArr.length-2];
-                        double ycoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[1]);
+                        lastPickNode = replicateFinalRouteArr[replicateFinalRouteArr.length-2];                      
                         double xcoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[0]);
                         //changing the pack node to be of the same x coord of the last pick node, with y coord = 1
-                        String changePackNode = xcoordOfLastPickNode + ",1" ;
-                    
-                        
-                        double distFromLastPickNodeToPackNode = ycoordOfLastPickNode;
-                        
+                        String changePackNode = xcoordOfLastPickNode + ",1,0" ;
+                                                                   
                         
                         for(String s: replicateFinalRouteArr){
                             System.out.print(s + "  " );
@@ -225,9 +220,7 @@ public class LocalSearch {
                 
                 }
                                
-              
-              //  String modifiedRouteStr = String.join("-", finalAns);
-              //System.out.println(" outside ");
+
                 String modifiedRouteStr = "";
                 for(int p = 0; p< finalAns.size(); p++){
                             String node = finalAns.get(p);
@@ -237,7 +230,6 @@ public class LocalSearch {
                             }
                             
                 }
-               // String modifiedRouteStr = String.join("-", finalAns);
                 modifiedRoutes.put(modifiedRouteStr,finalRouteTotalDist);
             
             

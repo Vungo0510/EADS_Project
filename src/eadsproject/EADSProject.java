@@ -253,8 +253,9 @@ public class EADSProject extends Application {
                         
                         SubgraphDesign subgraphDesign = new SubgraphDesign();
                         ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
-                        HashMap<Double, ArrayList<Double>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
+                        HashMap<Double, ArrayList<String>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
                         
+                        System.out.println("subgraph map: " + subgraphMap);
                         //TwiceAroundTheTree tatt = new TwiceAroundTheTree();
                         
                         //System.out.println("corner nodes: ");
