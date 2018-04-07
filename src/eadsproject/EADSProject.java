@@ -255,7 +255,7 @@ public class EADSProject extends Application {
                         ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
                         HashMap<Double, ArrayList<String>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
                         
-                        System.out.println("subgraph map: " + subgraphMap);
+                        //System.out.println("subgraph map: " + subgraphMap);
                         //TwiceAroundTheTree tatt = new TwiceAroundTheTree();
                         
                         //System.out.println("corner nodes: ");
@@ -283,7 +283,7 @@ public class EADSProject extends Application {
                         
                         /*
                         System.out.println("Time map for TATT:");
-                        HashMap sortedTimeMap = tatt.getTimeAmongNodes(subgraphMap, subgraphPartitioningResult);
+                        HashMap sortedTimeMap = tatt.getTimeAmongNodes(subgraphMap, subgraphPartitioningResult, Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
                         System.out.println(sortedTimeMap);
                         
                         System.out.println("Minimum spanning map:");
