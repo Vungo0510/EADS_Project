@@ -109,9 +109,10 @@ public class SubgraphDesign {
     public HashMap getSubgraphMap(ArrayList<String> pickingList, String cornerNodeFilePath) {
         cornerNodesMap = csvReader.readAllCornerNodes(cornerNodeFilePath);
         HashMap<Double, ArrayList<Double>> subgraphMap = new HashMap<>(cornerNodesMap);
+        HashMap<Double, ArrayList<String>> toReturn = new HashMap<>();
         
         ArrayList<Double> boundaryList = getPickListBoundary(pickingList, cornerNodeFilePath);
-        HashMap<Double, ArrayList<Double>> pickItemMap = new HashMap<>();
+        HashMap<Double, ArrayList<String>> pickItemMap = new HashMap<>();
         
         for (int i = 0; i < pickingList.size(); i++) {
             // adding pick items to a map with item's X coordinate as key and Y coordinate(s) as value(s)
@@ -121,15 +122,15 @@ public class SubgraphDesign {
             Double pickItemYCoordinate = Double.parseDouble(pickItemArr[2]);
             Double pickItemZCoordinate = Double.parseDouble(pickItemArr[3]);
             
-            ArrayList<Double> pickItemYZCoordArr = pickItemMap.get(pickItemXCoordinate);
+            ArrayList<String> pickItemYZCoordArr = pickItemMap.get(pickItemXCoordinate);
             
             if (pickItemYZCoordArr == null) {
                 pickItemYZCoordArr = new ArrayList<>();
             } 
             
             //if the array of all existing Y coordinates of pick items for this X coordinate doesn't contain the Y coordinate of this item, add it in the array
-            if (!pickItemYZCoordArr.contains(pickItemYCoordinate)) {
-                pickItemYZCoordArr.add(pickItemYCoordinate);
+            if (!pickItemYZCoordArr.contains(pickItemYCoordinate + "," + pickItemZCoordinate)) {
+                pickItemYZCoordArr.add(pickItemYCoordinate + "," + pickItemZCoordinate);
                 pickItemMap.put(pickItemXCoordinate, pickItemYZCoordArr);
             }
         }
@@ -152,15 +153,20 @@ public class SubgraphDesign {
         
         while (pickItemsIterator.hasNext()) {
             Double pickItemXCoord = pickItemsIterator.next();
-            ArrayList<Double> pickItemYCoordArr = pickItemMap.get(pickItemXCoord);
+            ArrayList<String> pickItemYZCoordArr = pickItemMap.get(pickItemXCoord);
             
-            //initially, this array only contains corner nodes's y coordinates for this x coordinates
+            //initially, this array only contains corner nodes' y coordinates for this x coordinates
             ArrayList<Double> nodesYCoordArr = subgraphMap.get(pickItemXCoord);
-            
+            ArrayList<String> nodesYZCoordArr = new ArrayList<>();
+                    
+            for (Double d : nodesYCoordArr) {
+                String thisYZCoord = d + ",0.0";
+                nodesYZCoordArr.add(thisYZCoord);
+            }
             //adding all pick items' y coordinate to the above array
-            nodesYCoordArr.addAll(pickItemYCoordArr);
+            nodesYZCoordArr.addAll(pickItemYZCoordArr);
             
-            subgraphMap.put(pickItemXCoord, nodesYCoordArr);
+            toReturn.put(pickItemXCoord, nodesYZCoordArr);
         }
         
         Iterator<Double> subgraphMapIterator = subgraphMap.keySet().iterator();
@@ -168,18 +174,47 @@ public class SubgraphDesign {
         while (subgraphMapIterator.hasNext()) {
             //node can be either an pick item or a corner node
             Double nodeXCoord = subgraphMapIterator.next();
-            ArrayList<Double> nodesYCoordArr = subgraphMap.get(nodeXCoord);
+            
+            //if this node doesn't alr exist in toReturn
+            if (toReturn.get(nodeXCoord) == null) {
+                ArrayList<Double> nodesYCoordArr = subgraphMap.get(nodeXCoord);
+                ArrayList<String> nodesYZCoordArr = new ArrayList<>();
+
+                for (Double d : nodesYCoordArr) {
+                    String thisYZCoord = d + ",0.0";
+                    nodesYZCoordArr.add(thisYZCoord);
+                }
+                
+                toReturn.put(nodeXCoord, nodesYZCoordArr);
+            }
+        }
         
-            nodesYCoordArr.sort(new Comparator<Double>() {
-                    public int compare (Double s1, Double s2) {
-                        return s1.intValue() - s2.intValue();
+        Iterator<Double> toReturnMapIterator = toReturn.keySet().iterator();
+        
+        while (toReturnMapIterator.hasNext()) {
+            //node can be either an pick item or a corner node
+            Double nodeXCoord = toReturnMapIterator.next();
+            ArrayList<String> nodesYZCoordArr = toReturn.get(nodeXCoord);
+        
+            nodesYZCoordArr.sort(new Comparator<String>() {
+                    public int compare (String thisYZCoord, String anotherYZCoord) {
+                        Double thisYCoord = Double.parseDouble(thisYZCoord.split(",")[0]);
+                        Double thisZCoord = Double.parseDouble(thisYZCoord.split(",")[1]);
+                        Double anotherYCoord = Double.parseDouble(anotherYZCoord.split(",")[0]);
+                        Double anotherZCoord = Double.parseDouble(anotherYZCoord.split(",")[1]);
+                        
+                        if (thisYCoord != anotherYCoord) {
+                            return thisYCoord.intValue() - anotherYCoord.intValue();
+                        } else {
+                            return thisZCoord.intValue() - anotherZCoord.intValue();
+                        }
                     }
                 });
             
-            subgraphMap.put(nodeXCoord, nodesYCoordArr);
+            toReturn.put(nodeXCoord, nodesYZCoordArr);
         }
               
-        return subgraphMap;
+        return toReturn;
     }
     
     public ArrayList<Double> getPickListBoundary(ArrayList<String> pickingList, String cornerNodeFilePath) {

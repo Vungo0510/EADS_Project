@@ -251,9 +251,9 @@ public class EADSProject extends Application {
 
                         ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap, startingPointText.getText());
                         
-                        //SubgraphDesign subgraphDesign = new SubgraphDesign();
-                        //ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
-                        //HashMap<Double, ArrayList<Double>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
+                        SubgraphDesign subgraphDesign = new SubgraphDesign();
+                        ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
+                        HashMap<Double, ArrayList<Double>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
                         
                         //TwiceAroundTheTree tatt = new TwiceAroundTheTree();
                         
@@ -277,7 +277,7 @@ public class EADSProject extends Application {
                         LocalSearch ls = new LocalSearch();
                         
                         if (finalRoutes.size() <= 3) {
-                        //    System.out.println("local search result: "+ls.localSearch(finalRoutes, pickingList , startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText())));
+                            System.out.println("local search result: "+ls.localSearch(finalRoutes, pickingList , startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText())));
                         }
                         
                         /*

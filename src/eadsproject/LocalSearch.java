@@ -64,7 +64,7 @@ public class LocalSearch {
                     replicateFinalRouteArr[secondPositionToSwap] = firstPositionToSwapStr;
                     
                     // calculate total dist of new route
-                    int totalDist = 0;
+                    double totalDist = 0.0;
                     double distOfStartPtToFirstPickNode = distOfStartPtToAllPt.get(replicateFinalRouteArr[1]);
                     totalDist += distOfStartPtToFirstPickNode;
                     
@@ -168,7 +168,7 @@ public class LocalSearch {
                     replicateFinalRouteArr[secondPositionToSwap] = firstPositionToSwapStr;
                     
                     // calculate total dist of new route
-                    double totalDist = 0;
+                    double totalDist = 0.0;
                     double distOfStartPtToFirstPickNode = distOfStartPtToAllPt.get(replicateFinalRouteArr[1]);
                     totalDist += distOfStartPtToFirstPickNode;
                     
