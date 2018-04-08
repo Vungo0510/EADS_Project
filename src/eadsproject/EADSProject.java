@@ -252,7 +252,10 @@ public class EADSProject extends Application {
                         if (startingPtRack.indexOf("M") == -1 && startingPtRack.indexOf("m") == -1) { //if rack has no M
                             Double startingPtRackInDouble = Double.parseDouble(startingPtRack);
                             startingPtYCoord = (startingPtRackInDouble - 5) + ((Double.parseDouble(df.format(startingPtRackInDouble)) - 7.0)/2.0);
-                        } else {
+                            if (startingPtRackInDouble % 2 == 0.0) {
+                                startingPtYCoord += 1;
+                            }
+                        } else { //if rack ends with "M"
                             Double startingPtRackInDouble = Double.parseDouble(startingPtRack.substring(0, startingPtRack.length() - 1));
                             startingPtYCoord = (startingPtRackInDouble - 4) + ((Double.parseDouble(df.format(startingPtRackInDouble)) - 7.0)/2.0);
                         }
@@ -282,9 +285,9 @@ public class EADSProject extends Application {
                         
                         SubgraphDesign subgraphDesign = new SubgraphDesign();
                         ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
-                        HashMap<Double, ArrayList<Double>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
+                        HashMap<Double, ArrayList<String>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
                         
-                        //TwiceAroundTheTree tatt = new TwiceAroundTheTree();
+                        TwiceAroundTheTree tatt = new TwiceAroundTheTree();
                         
                         //System.out.println("corner nodes: ");
                         //System.out.println(cornerNodesMap);
@@ -304,7 +307,7 @@ public class EADSProject extends Application {
                         
                         System.out.println("Local search routes and time:");
                         LocalSearch ls = new LocalSearch();
-                        HashMap<String, Double> modifiedRoutes = ls.localSearch(finalRoutes, pickingList , startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
+                        TreeMap<String, Double> modifiedRoutes = ls.localSearch(finalRoutes, pickingList , startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
                         
                         if (finalRoutes.size() <= 3) {
                             System.out.println("local search result: "+ modifiedRoutes);
@@ -312,21 +315,23 @@ public class EADSProject extends Application {
                         
                         
                        
-                        HashMap<String, Double> routeInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, modifiedRoutes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
+                        TreeMap<String, Double> routeInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, modifiedRoutes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
                         VisualisationResult vr = new VisualisationResult();
-                        vr.startResult(routeInOriginalLocationMap);
+                        vr.startResult(modifiedRoutes,routeInOriginalLocationMap);
                         
                         
-                        /*
+                        
                         System.out.println("Time map for TATT:");
-                        HashMap sortedTimeMap = tatt.getTimeAmongNodes(subgraphMap, subgraphPartitioningResult);
+                        HashMap sortedTimeMap = tatt.getTimeAmongNodes(subgraphMap, subgraphPartitioningResult, Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
                         System.out.println(sortedTimeMap);
                         
                         System.out.println("Minimum spanning map:");
                         HashMap minSpanMap = tatt.getMinimumSpanningMap(sortedTimeMap, subgraphPartitioningResult);
                         System.out.println("size: " + minSpanMap.keySet().size());
                         System.out.println(minSpanMap);
-                        */
+                        
+                        System.out.println("TATT route: " + tatt.getMinimumSpanningTree(minSpanMap, startingPt, intialSolution, ptToPtRouteAndTimeArr, pickItemCapacityMap, Double.parseDouble(mheCapacityText.getText()), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText())));
+                        
                     } 
                 }
             });

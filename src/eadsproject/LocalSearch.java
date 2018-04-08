@@ -15,9 +15,9 @@ import java.util.*;
 
 public class LocalSearch {
     
-    public HashMap<String, Double> localSearch(ArrayList<String> finalRoutes, ArrayList<String> pickingList, String startingPoint, String cornerNodeFilePath, double mheTravelTime, double mheLiftingTime){
+    public TreeMap<String, Double> localSearch(ArrayList<String> finalRoutes, ArrayList<String> pickingList, String startingPoint, String cornerNodeFilePath, double mheTravelTime, double mheLiftingTime){
     
-        HashMap<String, Double> modifiedRoutes = new HashMap<String, Double>(); //to store all the routes after local search is completed
+        TreeMap<String, Double> modifiedRoutes = new TreeMap<String, Double>(); //to store all the routes after local search is completed
         Clarke c = new Clarke();
         // retrieve distance from start pt to all pt
         ArrayList<HashMap> initialSolution = c.getInitialSolution(pickingList, startingPoint, cornerNodeFilePath, mheTravelTime, mheLiftingTime);
@@ -43,6 +43,14 @@ public class LocalSearch {
             ArrayList<String> finalAns = new ArrayList<String>();
             
             String[] toKeepRoute = new String[finalRouteArr.length];
+            if(finalRouteArr.length<= 3){
+                System.out.println("      check local search   ");
+                
+                System.out.println(finalRoute);
+                modifiedRoutes.put(finalRoute,finalRouteTotalDist);
+                return modifiedRoutes;
+            }
+            
             if( finalRouteArr.length>3 ){
                 int totalSwap = finalRouteArr.length/2;
                 int noOfSwapSoFar = 0;
@@ -257,8 +265,10 @@ public class LocalSearch {
     }
     
     
-    public HashMap<String, Double> convertXYZCoordToOriginalLocation (ArrayList<String> pickingList, HashMap<String, Double> modifiedRoutes, String csvFile, String startingPoint, String startingPtInXYCoordinates){
-        HashMap<String, Double> routeInOriginalLocationMap = new HashMap<String, Double>();
+    public TreeMap<String, Double> convertXYZCoordToOriginalLocation (ArrayList<String> pickingList, TreeMap<String, Double> modifiedRoutes, String csvFile, String startingPoint, String startingPtInXYCoordinates){
+        TreeMap<String, Double> routeInOriginalLocationMap = new TreeMap<String, Double>(); // key is route, value is the time for the route
+        String[] startingPointSplit = startingPoint.split(",");
+        startingPoint = startingPointSplit[0] + ",*," + startingPointSplit[1]; 
         
         Iterator iter = modifiedRoutes.keySet().iterator();
         CSVReader reader = new CSVReader();

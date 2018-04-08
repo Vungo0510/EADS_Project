@@ -24,12 +24,13 @@ import javafx.scene.shape.Path;
 
 import javafx.scene.chart.*;
 import javafx.collections.*;
+import javafx.scene.chart.XYChart.*;
          
 public class VisualisationResult { 
   // @Override 
-   public void startResult(HashMap<String, Double> modifiedRoutes) {     
+   public void startResult(TreeMap<String, Double> modifiedRoutes,  TreeMap<String, Double> routeInOriginalLocationMap) {     
         Stage stage = new Stage(); 
-       
+                       
         // Creating a border pane
         BorderPane borderPane = new BorderPane();
         Text text = new Text(); // creating this for the top of our border pane
@@ -38,7 +39,6 @@ public class VisualisationResult {
         double textX = 0.0;
         double textY = 10.0;
         
-        Iterator modifiedRoutesKeySetIter = modifiedRoutes.keySet().iterator();
         
         //Creating a top pane object  
         Pane topPane = new Pane(); 
@@ -48,14 +48,19 @@ public class VisualisationResult {
         Text titleText = new Text(textX, textY, " RESULTS: ");
         
         topPane.getChildren().addAll(titleText);
+       
+        Iterator modifiedRoutesKeySetIter = modifiedRoutes.keySet().iterator();
+        Iterator originalLocationRoutesKeySetIter1 = routeInOriginalLocationMap.keySet().iterator();
 
-        
-        while (modifiedRoutesKeySetIter.hasNext()) {
-            //textX +=100.0;
+        Iterator originalLocationRoutesKeySetIter = routeInOriginalLocationMap.keySet().iterator();
+
+        while (originalLocationRoutesKeySetIter1.hasNext()) {
+            //print out the routes & time in prose            
             textY +=30.0;
-            String thisModifiedRoute = (String) modifiedRoutesKeySetIter.next();
-            double totalTimeInSecs = modifiedRoutes.get(thisModifiedRoute);
-            localSearchText = new Text(textX, textY, " Route to take: " + thisModifiedRoute);
+            String thisOriginalLocationRoute = (String) originalLocationRoutesKeySetIter1.next();
+
+            double totalTimeInSecs = routeInOriginalLocationMap.get(thisOriginalLocationRoute);
+            localSearchText = new Text(textX, textY, " Route to take: " + thisOriginalLocationRoute);
             textY +=15.0;
             Text totalTimeInSecsText = new Text(textX, textY, " Total time: " + Double.toString(totalTimeInSecs));
                  topPane.getChildren().addAll(localSearchText);
@@ -69,31 +74,89 @@ public class VisualisationResult {
         borderPane.setTop(topPane);
         
         
-        // creating a center pane object
+        // creating a center pane object to be used for the diagram
          Pane centerPane = new Pane(); 
   
-        NumberAxis  xAxis = new NumberAxis ();
+        NumberAxis xAxis = new NumberAxis ();
         NumberAxis  yAxis = new NumberAxis ();      
         xAxis.setLabel("x axis");
         yAxis.setLabel("y axis");
         
+        LineChart<Double, Double> lineChart = new LineChart(xAxis, yAxis);      
         
-        LineChart lineChart = new LineChart(xAxis, yAxis);
-      
         
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        //populate series with data
-        series.getData().add(new XYChart.Data<>(1, 23));
-        series.getData().add(new XYChart.Data<>(2, 14));
-        series.getData().add(new XYChart.Data<>(3, 15));
-        series.getData().add(new XYChart.Data<>(4, 24));
-        series.getData().add(new XYChart.Data<>(2, 24));
-        lineChart.setAxisSortingPolicy(LineChart.SortingPolicy.NONE);
-        lineChart.getData().add(series);
+        
+        Iterator modifiedRoutesKeySetIter2 = modifiedRoutes.keySet().iterator();
 
+        originalLocationRoutesKeySetIter.hasNext();
+        
+        
+        while (modifiedRoutesKeySetIter2.hasNext() ) {
+            int counter = 0;
+            XYChart.Series<Double, Double> series = new XYChart.Series<>();
+            series.setName("Route " + counter);
+            series.getData().clear();
+
+            //adding all the nodes into the diagram
+            textY +=30.0;
+            String thisModifiedRoute = (String) modifiedRoutesKeySetIter2.next();
+            String thisOriginalLocationRoute = (String) originalLocationRoutesKeySetIter.next(); // returns one route in original location
+            String[] thisModifiedRouteArr = thisModifiedRoute.split("-");
+            String[] thisOriginalLocationRouteArr = thisOriginalLocationRoute.split("-");
+            
+            
+            
+            for(String nodesInOriginalLocationRoute: thisOriginalLocationRouteArr){
+                // to loop through all the nodes in thisOriginalLocationRouteArr
+                         
+                
+                
+                 System.out.println(nodesInOriginalLocationRoute + "  nodesInOriginalLocationRoute");
+                 Double nodesInOriginalLocationRouteXCoord = 0.0;
+                 Double nodesInOriginalLocationRouteYCoord = 0.0;
+                 
+                 if(nodesInOriginalLocationRoute.contains(",")){
+                     // this is either a start node or corner nodes
+                    nodesInOriginalLocationRouteXCoord = Double.parseDouble(nodesInOriginalLocationRoute.split(",")[0]);
+                    nodesInOriginalLocationRouteYCoord = Double.parseDouble(nodesInOriginalLocationRoute.split(",")[2]); 
+                 
+                 
+                 }else{
+                     // this is a pick node
+                    nodesInOriginalLocationRouteXCoord = Double.parseDouble(nodesInOriginalLocationRoute.substring(0,2));
+                    nodesInOriginalLocationRouteYCoord = Double.parseDouble(nodesInOriginalLocationRoute.substring(3,5)); 
+                 
+                 
+                 }
+                            
+           
+                //populate series with data
+                Data<Double, Double> d = new XYChart.Data<>(nodesInOriginalLocationRouteXCoord, nodesInOriginalLocationRouteYCoord);               
+                series.getData().add(d);
+                 
+                counter +=1;
+            
+            }
+            
+             lineChart.getData().add(series);
+            
+        
+
+           // hbox.getChildren().addAll(localSearchText, totalTimeInSecsText);
+        }
+        
+
+      
+       
+       
+        //series.getData().add(new XYChart.Data<>(2, 14));
+          
+        lineChart.setAxisSortingPolicy(LineChart.SortingPolicy.NONE);
+       
        // Scene scene  = new Scene(new BorderPane(linechart),800,600);
 
-borderPane.setCenter(lineChart);
+        borderPane.setCenter(lineChart);
+       
         
         
         

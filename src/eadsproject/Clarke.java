@@ -412,7 +412,11 @@ public class Clarke {
                     //if thisItem and anotherItem both appear at either the first or last position of their routes: we have to flip the shorter route before merging
                     if ((thisRouteSplit[0].equals(thisItem) && anotherRouteSplit[0].equals(anotherItem)) || (thisRouteSplit[thisRouteSplit.length - 1].equals(thisItem) && anotherRouteSplit[anotherRouteSplit.length - 1].equals(anotherItem))) {
                         
-                        if (thisRouteSplit.length > anotherRouteSplit.length) { //if thisRoute is longer than anotherRoute
+                        if (thisRouteSplit.length == 1) {
+                            newRoute = thisRoute + "-" + anotherRoute;
+                        } else if (anotherRouteSplit.length == 1) {
+                            newRoute = anotherRoute + "-" + thisRoute;
+                        } else if (thisRouteSplit.length > anotherRouteSplit.length) { //if thisRoute is longer than anotherRoute
                             
                             if (thisRouteSplit[0].equals(thisItem)) { //if thisItem and anotherItem are both first nodes in their routes, new route = flipped route + this route
                                 String flippedAnotherRoute = "";
@@ -420,8 +424,10 @@ public class Clarke {
                                 for (int i = anotherRouteSplit.length -1; i >= 0; i--) {
                                     flippedAnotherRoute += anotherRouteSplit[i] + "-";
                                 }
-
+                                
+                                
                                 newRoute = flippedAnotherRoute + thisRoute;
+                                System.out.println("new route 426: " + newRoute);
                                 
                             } else { //if thisItem and anotherItem are both last nodes in their routes, new route = this route + flipped route 
                                 newRoute = thisRoute;
@@ -433,7 +439,7 @@ public class Clarke {
                                 }
 
                                 newRoute += flippedAnotherRoute;
-                                
+                                System.out.println("new route 438: " + thisItem + "//" + thisRoute + "---" + anotherItem + "//" + anotherRoute + ": " + newRoute);
                             }
                             
                         } else { //if thisRoute is shorter than or as long as anotherRoute
@@ -446,6 +452,7 @@ public class Clarke {
                                 }
 
                                 newRoute = flippedThisRoute + anotherRoute;
+                                System.out.println("new route 451: " + newRoute);
                                 
                             } else { //if thisItem and anotherItem are both last nodes in their routes, new route = this route + flipped route 
                                 newRoute = anotherRoute;
@@ -457,6 +464,7 @@ public class Clarke {
                                 }
                                 
                                 newRoute += flippedThisRoute;
+                                System.out.println("new route 463: " + newRoute);
                                 
                             }
                         }
@@ -630,10 +638,12 @@ public class Clarke {
                     String thisPath = thisNode + "to" + nextNode;
                     
                     if (timeFromPickItemToPickItem.get(thisPath) != null) {
+                        //System.out.println("this path: " + thisPath);
                         thisRouteTotalTime += (Double) timeFromPickItemToPickItem.get(thisPath);
                         //System.out.println("route key: " + thisPath + ", time: " + timeFromPickItemToPickItem.get(thisPath) + " --- total time so far: " + thisRouteTotalTime);
                     } else {
                         thisPath = nextNode + "to" + thisNode;
+                        System.out.println("this path: " + thisPath);
                         thisRouteTotalTime += (Double) timeFromPickItemToPickItem.get(thisPath);
                         //System.out.println("route key: " + thisPath + ", time: " + timeFromPickItemToPickItem.get(thisPath) + " --- total time so far: " + thisRouteTotalTime);
                     }
