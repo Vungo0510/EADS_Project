@@ -330,7 +330,7 @@ public class EADSProject extends Application {
                         System.out.println("size: " + minSpanMap.keySet().size());
                         System.out.println(minSpanMap);
                         
-                        HashMap TATTResult = tatt.getMinimumSpanningTree(minSpanMap, startingPt, intialSolution, ptToPtRouteAndTimeArr, pickItemCapacityMap, Double.parseDouble(mheCapacityText.getText()), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
+                        TreeMap TATTResult = tatt.getMinimumSpanningTree(minSpanMap, startingPt, intialSolution, ptToPtRouteAndTimeArr, pickItemCapacityMap, Double.parseDouble(mheCapacityText.getText()), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
                         System.out.println("TATT route: " + TATTResult);
                         
                         Set modifiedTATTRoutesKeySet = TATTResult.keySet();
