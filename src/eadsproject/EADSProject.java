@@ -338,10 +338,10 @@ public class EADSProject extends Application {
                         listOfTATTRoutes.addAll(modifiedTATTRoutesKeySet);
 
                         
-                        System.out.println("Local search TATT routes and time:");
+                        //System.out.println("Local search TATT routes and time:");
                         TreeMap<String, Double> modifiedTATTRoutes = new TreeMap<>(TATTResult);
                         
-                        
+                        //System.out.println("TATT desc keyset: " + modifiedTATTRoutes.descendingKeySet());
                         
                         if (finalRoutes.size() <= 3) {
                             //System.out.println("local search result: "+ modifiedRoutes);
