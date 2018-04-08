@@ -253,9 +253,8 @@ public class EADSProject extends Application {
                         
                         SubgraphDesign subgraphDesign = new SubgraphDesign();
                         ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
-                        HashMap<Double, ArrayList<String>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
+                        HashMap<Double, ArrayList<Double>> subgraphMap = subgraphDesign.getSubgraphMap(pickingList, cornerNodesFile.getAbsolutePath());
                         
-                        //System.out.println("subgraph map: " + subgraphMap);
                         //TwiceAroundTheTree tatt = new TwiceAroundTheTree();
                         
                         //System.out.println("corner nodes: ");
@@ -276,14 +275,22 @@ public class EADSProject extends Application {
                         
                         System.out.println("Local search routes and time:");
                         LocalSearch ls = new LocalSearch();
+                        HashMap<String, Double> modifiedRoutes = ls.localSearch(finalRoutes, pickingList , startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
                         
                         if (finalRoutes.size() <= 3) {
-                            System.out.println("local search result: "+ls.localSearch(finalRoutes, pickingList , startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText())));
+                            System.out.println("local search result: "+ modifiedRoutes);
                         }
+                        
+                        
+                       
+                        HashMap<String, Double> routeInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, modifiedRoutes, pickListFile.getAbsolutePath());
+                        VisualisationResult vr = new VisualisationResult();
+                        vr.startResult(routeInOriginalLocationMap);
+                        
                         
                         /*
                         System.out.println("Time map for TATT:");
-                        HashMap sortedTimeMap = tatt.getTimeAmongNodes(subgraphMap, subgraphPartitioningResult, Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
+                        HashMap sortedTimeMap = tatt.getTimeAmongNodes(subgraphMap, subgraphPartitioningResult);
                         System.out.println(sortedTimeMap);
                         
                         System.out.println("Minimum spanning map:");
@@ -381,6 +388,9 @@ public class EADSProject extends Application {
       stage.show(); 
    }      
    public static void main(String args[]){ 
-      launch(args); 
+      launch(args);
+      System.out.println("JEEEELLLOO ");
+     
+      
    } 
 }

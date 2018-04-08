@@ -117,6 +117,51 @@ public class CSVReader {
         return pickingList;
     }
     
+    public HashMap<String, String> retrieveOriginalLocationOfPickItem(String csvFile) {
+
+        //String csvFile = "./Data/PickingList.csv"; //Already shifted to the correct position for ppl to walk on
+       
+        File f = new File(csvFile);
+        System.out.println(f.getAbsolutePath());
+        
+        BufferedReader br = null;
+        String line = "";
+        String cvsSplitBy = ",";
+        //System.out.println(csvFile);
+        HashMap<String, String> locationMap = new HashMap<>(); //key is x,y,z coord of pick item, value is original location of pick item
+        
+        try {
+            br = new BufferedReader(new FileReader(csvFile));
+            line = br.readLine(); //skip first line
+            
+            while ((line = br.readLine()) != null) {
+
+                // use comma as separator
+                String[] pickItem = line.split(cvsSplitBy);
+                String originalLocation = pickItem[0]; //this is location description in CSV file
+                String xCoordinate = Double.toString(Double.parseDouble(pickItem[4]));
+                String yCoordinate = Double.toString(Double.parseDouble(pickItem[5]));
+                String zCoordinate = pickItem[6];
+                String numOfCartons = pickItem[7];
+                String location = xCoordinate + "," + yCoordinate + "," + zCoordinate;
+                locationMap.put(location, originalLocation);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return locationMap;
+    }
+    
     public HashMap<String, Double> readPickItemCapacity (String csvFile) {
 
         //String csvFile = "./Data/PickingList.csv"; //Already shifted to the correct position for ppl to walk on
