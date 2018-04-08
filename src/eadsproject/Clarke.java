@@ -301,12 +301,12 @@ public class Clarke {
             String thisItem = thisKeyArr[0]; //this contains x-y coordinate of the first pick item (before "to") from savings map
             String anotherItem = thisKeyArr[1]; //this contains x-y coordinate of the second pick item (after "to") from savings map
             
-            System.out.println("this item: " + thisItem);
+            //System.out.println("this item: " + thisItem);
             
             //if capacity of thisItem is 0, make it 1 as we're using at least 1 carton. Else keep it as it is
             double thisItemCapacity = pickItemCapacityMap.get(thisItem) > 0 ? pickItemCapacityMap.get(thisItem) : 1;
             
-            System.out.println("another item: " + anotherItem);
+            //System.out.println("another item: " + anotherItem);
             //if capacity of anotherItem is 0, make it 1 as we're using at least 1 carton. Else keep it as it is
             double anotherItemCapacity = pickItemCapacityMap.get(anotherItem) > 0 ? pickItemCapacityMap.get(anotherItem) : 1;
             

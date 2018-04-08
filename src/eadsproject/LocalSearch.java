@@ -34,7 +34,7 @@ public class LocalSearch {
             // loop through the arrayList of finalRoutes to do local search on each route
             String finalRoute = finalRoutes.get(i);
             double finalRouteTotalDist = finalRoutesDistHashMap.get(finalRoute);
-            System.out.println(" finalRouteTotalDist " + finalRouteTotalDist);
+            //System.out.println(" finalRouteTotalDist " + finalRouteTotalDist);
             
             String[] finalRouteArr = finalRoute.split("-"); //first and last element are to be ignored: they are the starting position and packing position
             String[] modifiedRouteArr = finalRoute.split("-"); // to store the better modified route later
@@ -58,7 +58,6 @@ public class LocalSearch {
                 
                 for(int j=0; j< totalSwap; j++){
                     //swap  two random elements after starting position
-                  //  System.out.println("j times " + j);
                    
                     String firstPositionToSwapStr = replicateFinalRouteArr[firstPositionToSwap];
                     String secondPositionToSwapStr = replicateFinalRouteArr[secondPositionToSwap];
@@ -75,23 +74,19 @@ public class LocalSearch {
                         // find the distance of all the pick nodes in the routes all the way to the packing location in the route that has finished swapping 2 pick items
                         String pickNode1 = replicateFinalRouteArr[k];                     
                         
-                    //    System.out.println("pick node 1 : " + pickNode1);
                         
                         String pickNode2 = replicateFinalRouteArr[k+1];
-                  //      System.out.println("pick node 2: " + pickNode2);
                         
                         double distBetweenPickNodes = 0;
                         if(distAmongPickItems.get(pickNode1 +"to" + pickNode2) !=null){
                             
                             distBetweenPickNodes = distAmongPickItems.get(pickNode1 +"to" + pickNode2);
-                           // System.out.println(" dist " +distBetweenPickNodes );
                         }else{
                             distBetweenPickNodes = distAmongPickItems.get(pickNode2 +"to" + pickNode1);
-                            //System.out.println(" dist " +distBetweenPickNodes );
                         }
                     
                         totalDist +=distBetweenPickNodes;
-                        System.out.println("dist so far: " +totalDist );
+                        //System.out.println("dist so far: " +totalDist );
                       
                     
                     }
@@ -114,10 +109,9 @@ public class LocalSearch {
                         double xcoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[0]);
                         //changing the pack node to be of the same x coord of the last pick node, with y coord = 1
                         String changePackNode = xcoordOfLastPickNode + ",1.0,0.0";
-                                          
+                                         
                         
                         for(String s: replicateFinalRouteArr){
-                         //   System.out.print(s + "  " );
                             finalAns.add(s);
                             
                         }
@@ -141,12 +135,14 @@ public class LocalSearch {
                     for(int p = 1; p< finalAns.size()-2; p++){
                             String node = finalAns.get(p);
                             String nxtNode = finalAns.get(p+1);
-                             System.out.println(node + " node ");
-                             System.out.println(nxtNode + " nxt node ");
+                             //System.out.println(node + " node ");
+                             //System.out.println(nxtNode + " nxt node ");
                             String intermediateRouteWithCornerNode = routeFromCurrPickNodeToOtherPickNode.get(node +"to" +nxtNode);
                             if(intermediateRouteWithCornerNode == null){
                                  intermediateRouteWithCornerNode = routeFromCurrPickNodeToOtherPickNode.get(nxtNode +"to" + node);
+                                 //System.out.println("before flip: " + intermediateRouteWithCornerNode);
                                  String[] intermediateRouteWithCornerNodeArr= intermediateRouteWithCornerNode.split("-");
+                                 //System.out.println("intermediate route split arr: " + intermediateRouteWithCornerNodeArr);
                                  
                                  String routeIWant = "";
                                  for(int z = intermediateRouteWithCornerNodeArr.length-1; z >-1; z--){
@@ -164,13 +160,13 @@ public class LocalSearch {
                                 
                                ;
                                 // cut off the second pick node
-                                System.out.println(intermediateRouteWithCornerNode + " intermediateRouteWithCornerNode ");
+                                //System.out.println(intermediateRouteWithCornerNode + " intermediateRouteWithCornerNode ");
                                 int indexOfDash = intermediateRouteWithCornerNode.lastIndexOf("-");
                                 intermediateRouteWithCornerNode = intermediateRouteWithCornerNode.substring(0,indexOfDash+1);
                                 
-                                System.out.println(intermediateRouteWithCornerNode + " intermediateRouteWithCornerNode Aftercut");
+                               // System.out.println(intermediateRouteWithCornerNode + " intermediateRouteWithCornerNode Aftercut");
                                 finalAnsWithCornerNodes +=intermediateRouteWithCornerNode;
-                                System.out.println(finalAnsWithCornerNodes + " finalAnsWithCornerNodes");
+                              //  System.out.println(finalAnsWithCornerNodes + " finalAnsWithCornerNodes");
                                 modifiedRouteStr += node;
                                 if(p!= finalAns.size()-1){
                                     modifiedRouteStr +="-";
@@ -195,11 +191,10 @@ public class LocalSearch {
                     String startNodeOfRoute2 = finalAns.get(0);
                     String firstPickNodeOfRoute2 = finalAns.get(1);
 
-                   // String yCoordOfFirstPickNode =firstPickNodeOfRoute2.split(",")[1];
                     String xCoordOfFirstPickNode =firstPickNodeOfRoute2.split(",")[0];
                     String cornerNodeBetweenStartNodeAndFirstPickNode = xCoordOfFirstPickNode + ",1.0,0.0";
                     String firstInterMediateRoute = startNodeOfRoute2 + "-" + cornerNodeBetweenStartNodeAndFirstPickNode + "-";
-                    //routeFromStartNodeToFirstPickNode = routeFromStartNodeToFirstPickNode.substring(0, routeFromStartNodeToFirstPickNode.lastIndexOf("-"));
+
                     finalAnsWithCornerNodes +=firstInterMediateRoute;
                      for(int p = 1; p< finalAns.size()-2; p++){
                             String node = finalAns.get(p);
@@ -225,7 +220,6 @@ public class LocalSearch {
                                 // cut off the second pick node
                                 int indexOfDash = intermediateRouteWithCornerNode.lastIndexOf("-");
                                 intermediateRouteWithCornerNode = intermediateRouteWithCornerNode.substring(0,indexOfDash+1);
-                                System.out.println(intermediateRouteWithCornerNode + "intermediateRouteWithCornerNode");
                                 finalAnsWithCornerNodes +=intermediateRouteWithCornerNode;
                                 modifiedRouteStr += node;
                                 if(p!= finalAns.size()-1){
@@ -263,7 +257,112 @@ public class LocalSearch {
     }
     
     
+    public HashMap<String, Double> convertXYZCoordToOriginalLocation (ArrayList<String> pickingList, HashMap<String, Double> modifiedRoutes, String csvFile, String startingPoint, String startingPtInXYCoordinates){
+        HashMap<String, Double> routeInOriginalLocationMap = new HashMap<String, Double>();
+        
+        Iterator iter = modifiedRoutes.keySet().iterator();
+        CSVReader reader = new CSVReader();
+        HashMap<String, String> locationMap = reader.retrieveOriginalLocationOfPickItem(csvFile);
+        String[] startingPtInXYCoordinatesSplit = startingPtInXYCoordinates.split(",");
+        startingPtInXYCoordinates = startingPtInXYCoordinatesSplit[0] + ".0," + startingPtInXYCoordinatesSplit[1] + ".0,0.0";
+                
+        while(iter.hasNext()){
+            String thisRoute = (String) iter.next();
+            
+            double distanceOfThisRoute = modifiedRoutes.get(thisRoute);
+            String[] thisRouteArr = thisRoute.split("-");
+            String routeInOriginalLocation = "";     
+            
+            for(String node: thisRouteArr){
+                if (node.equals(startingPtInXYCoordinates)) {
+                    routeInOriginalLocation +=startingPoint + "-";
+                } else {
+                    String thisNodeOriginalLocation = locationMap.get(node);
+                    if(thisNodeOriginalLocation!= null){
+                        //means that this node is a pick node
+                         routeInOriginalLocation +=thisNodeOriginalLocation + "-";
+
+                    }else{
+                        // means that this node is a corner node
+                        String[] nodeArr = node.split(",");
+                        String nodeYCoord = nodeArr[1]; // 
+
+
+                        Double oldNodeXCoord = Double.parseDouble(nodeArr[0]); //our X coordinate 
+                        Integer oldNodeXCoordInInt = oldNodeXCoord.intValue();
+                        //System.out.println("our x coord: " + oldNodeXCoord);
+
+                        Integer newNodeXCoord = -1; //X coordinate in their system
+
+                        if (oldNodeXCoord % 2 == 0) { //if our X coordinate is even
+                            newNodeXCoord = (oldNodeXCoordInInt + 6) / 2;
+                        } else { //if our X coordinate is odd
+                            newNodeXCoord = (oldNodeXCoordInInt + 7) / 2;
+                        }
+
+                        String nodeZCoord = "*";
+
+                        if(nodeYCoord.equals("1.0")){
+                            nodeYCoord = "06"; // if y coord = 1, must change it to 06
+
+
+                        }else if(nodeYCoord.equals("77.0")){                       
+                            // converting the last corner node at y coordinate = 77
+                            nodeYCoord = "56";
+
+
+                        }else if(nodeYCoord.equals("35.0")){                       
+                            // converting the last corner node at y coordinate = 77
+                            nodeYCoord = "29";
+
+
+                        }else if(nodeYCoord.equals("37.0")){                       
+                            // converting the last corner node at y coordinate = 77
+                            nodeYCoord = "30";
+                        } else {
+                            //System.out.println("node Y coord: " + nodeYCoord);
+                            Double nodeYCoordInDouble = Double.parseDouble(nodeYCoord);
+                            Double nodeYCoordOriginalCoord = (nodeYCoordInDouble * 2 + 19)/3;
+                            
+                            if (nodeYCoordOriginalCoord % 1 != 0.0) {
+                                nodeYCoordOriginalCoord = (nodeYCoordInDouble * 2 + 17)/3;
+                            }
+                            
+                            nodeYCoord = nodeYCoordOriginalCoord.intValue() + "";
+                        }
+                        
+                        
+                        String cornerNodeToDisplay = "";
+                        
+                        if (newNodeXCoord.toString().length() == 1) {
+                            cornerNodeToDisplay = "0" + newNodeXCoord +"," + nodeZCoord + ","+ nodeYCoord; // this is trying to convert it to the original location style
+                        } else {
+                            cornerNodeToDisplay = newNodeXCoord +"," + nodeZCoord + ","+ nodeYCoord; // this is trying to convert it to the original location style
+                        }
+                        
+
+                        routeInOriginalLocation +=cornerNodeToDisplay + "-";
+
+                    }
+                
+                }
+            
+            }
+            
+            routeInOriginalLocation = routeInOriginalLocation.substring(0, routeInOriginalLocation.length()-1);
+            routeInOriginalLocationMap.put(routeInOriginalLocation,distanceOfThisRoute);
+            
     
+    
+        }
+    
+        
+        
+        
+        
+        return routeInOriginalLocationMap;
+    
+    }
     
     
 }

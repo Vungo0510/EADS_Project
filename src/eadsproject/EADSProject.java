@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.lang.NumberFormatException;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 import javafx.application.Application; 
 import javafx.collections.FXCollections; 
@@ -176,7 +178,7 @@ public class EADSProject extends Application {
                     
                     try {
                         Integer.parseInt(startingPtSplit[0]);
-                        Integer.parseInt(startingPtSplit[1]);
+                        Integer.parseInt(startingPtSplit[1].substring(0, startingPtSplit[1].length() - 1));
                     } catch (NumberFormatException nfe) {
                         hasError = true;
                         mheCapacityError.setText("X and Y coordinate of starting point must be an integer");
@@ -231,6 +233,33 @@ public class EADSProject extends Application {
                     }
                     
                     if (!hasError) {
+                        DecimalFormat df = new DecimalFormat("#");
+                        df.setRoundingMode(RoundingMode.CEILING);
+                        String startingPtLane = startingPtSplit[0];
+                        String startingPtRack = startingPtSplit[1];
+                        
+                        Double startingPtLaneInDouble = Double.parseDouble(startingPtLane);
+                        
+                        Double startingPtXCoord = 0.0;
+                        Double startingPtYCoord = 0.0;
+                        
+                        if (startingPtLaneInDouble % 2 == 0.0) {
+                            startingPtXCoord = startingPtLaneInDouble * 2 - 7;
+                        } else {
+                            startingPtXCoord = startingPtLaneInDouble * 2 - 6;
+                        }
+                        
+                        if (startingPtRack.indexOf("M") == -1 && startingPtRack.indexOf("m") == -1) { //if rack has no M
+                            Double startingPtRackInDouble = Double.parseDouble(startingPtRack);
+                            startingPtYCoord = (startingPtRackInDouble - 5) + ((Double.parseDouble(df.format(startingPtRackInDouble)) - 7.0)/2.0);
+                        } else {
+                            Double startingPtRackInDouble = Double.parseDouble(startingPtRack.substring(0, startingPtRack.length() - 1));
+                            startingPtYCoord = (startingPtRackInDouble - 4) + ((Double.parseDouble(df.format(startingPtRackInDouble)) - 7.0)/2.0);
+                        }
+                        String startingPt = startingPtXCoord.intValue() + "," + startingPtYCoord.intValue();
+                        
+                        System.out.println("starting point is: " + startingPt);
+                        
                         ArrayList<String> pickingList = csvReader.readPickingList(pickListFile.getAbsolutePath());
                         TreeMap<Double, ArrayList<Double>> cornerNodesMap = csvReader.readAllCornerNodes(cornerNodesFile.getAbsolutePath());
                         HashMap<String, Double> pickItemCapacityMap = csvReader.readPickItemCapacity(pickListFile.getAbsolutePath());
@@ -239,17 +268,17 @@ public class EADSProject extends Application {
 
                         Clarke c = new Clarke();
 
-                        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList, startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
+                        ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList, startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
                         HashMap<String, Double> timeFromStartPtToAllPt = intialSolution.get(0);
 
                         ArrayList<HashMap> ptToPtRouteAndTimeArr = c.getPointToPointTime(pickingList, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
                         HashMap<String, Double> timeAmongPickItems = ptToPtRouteAndTimeArr.get(0);
 
-                        HashMap<String, Double> savingsMap = c.getSavingsMap(pickingList, startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
+                        HashMap<String, Double> savingsMap = c.getSavingsMap(pickingList, startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
 
-                        HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, Double.parseDouble(mheCapacityText.getText()), startingPointText.getText());
+                        HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, Double.parseDouble(mheCapacityText.getText()), startingPt);
 
-                        ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap, startingPointText.getText());
+                        ArrayList<String> finalRoutes = c.getFinalRoutes(solutionMap, startingPt);
                         
                         SubgraphDesign subgraphDesign = new SubgraphDesign();
                         ArrayList<ArrayList<String>> subgraphPartitioningResult = subgraphDesign.subgraphPartitioning(pickingList, cornerNodesFile.getAbsolutePath());
@@ -271,11 +300,11 @@ public class EADSProject extends Application {
                         System.out.println(finalRoutes);
                         
                         System.out.println("Final routes and time:");
-                        System.out.println(c.getTimeOfFinalRoutes(pickingList, finalRoutes, startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText())));
+                        System.out.println(c.getTimeOfFinalRoutes(pickingList, finalRoutes, startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText())));
                         
                         System.out.println("Local search routes and time:");
                         LocalSearch ls = new LocalSearch();
-                        HashMap<String, Double> modifiedRoutes = ls.localSearch(finalRoutes, pickingList , startingPointText.getText(), cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
+                        HashMap<String, Double> modifiedRoutes = ls.localSearch(finalRoutes, pickingList , startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
                         
                         if (finalRoutes.size() <= 3) {
                             System.out.println("local search result: "+ modifiedRoutes);
@@ -283,7 +312,7 @@ public class EADSProject extends Application {
                         
                         
                        
-                        HashMap<String, Double> routeInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, modifiedRoutes, pickListFile.getAbsolutePath());
+                        HashMap<String, Double> routeInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, modifiedRoutes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
                         VisualisationResult vr = new VisualisationResult();
                         vr.startResult(routeInOriginalLocationMap);
                         
