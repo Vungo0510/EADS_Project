@@ -317,6 +317,7 @@ public class TwiceAroundTheTree {
                 
                 if (timeAmongPickNodes.get(pickNode + "to" + nextPickNode) == null) {
                     timeFromThisNodeToNextPickNode = (double) timeAmongPickNodes.get(nextPickNode + "to" + pickNode);
+                    
                 } else {
                     timeFromThisNodeToNextPickNode = (double) timeAmongPickNodes.get(pickNode + "to" + nextPickNode);
                 }
@@ -337,14 +338,17 @@ public class TwiceAroundTheTree {
                         }
                     }
                 }
+                System.out.println("Pick path from " + pickNode + "to" + nextPickNode + ": " + routeFromThisNodeToNextPickNode);
                 if (i != minimumSpanningTree.size() - 2) {
-                    System.out.println("this route before cut: " + routeFromThisNodeToNextPickNode);
+                    //System.out.println("this route before cut: " + routeFromThisNodeToNextPickNode);
                     routeFromThisNodeToNextPickNode = routeFromThisNodeToNextPickNode.substring(0, routeFromThisNodeToNextPickNode.lastIndexOf("-"));
-                    System.out.println("this route: " + routeFromThisNodeToNextPickNode);
+                    //System.out.println("this route: " + routeFromThisNodeToNextPickNode);
                 }
+
                 thisFinalRoute += routeFromThisNodeToNextPickNode + "-";   
-            
+                System.out.println("final route so far: " + thisFinalRoute);
             } else {
+                System.out.println("GOT INTO ELSE");
                 String[] thisFinalRouteSplit = thisFinalRoute.split("-");
                 String firstPickNode = thisFinalRouteSplit[0];
                 String[] lastPickNodeSplit = thisFinalRouteSplit[thisFinalRouteSplit.length - 1].split(",");
@@ -359,11 +363,13 @@ public class TwiceAroundTheTree {
                 String routeFromStartToFirstPickNode = "";
                 
                 if (startNodeOfThisRoute.equals(startingPoint)) {
+                    System.out.println("GOT INTO SMALLER IF");
                     totalTime += (double) originalTimeFromStartPtToAllPt.get(firstPickNode);
                     routeFromStartToFirstPickNode = (String) routeFromStartPtToAllPt.get(firstPickNode);
                     routeFromStartToFirstPickNode = routeFromStartToFirstPickNode.substring(0, routeFromStartToFirstPickNode.lastIndexOf("-"));
                 } else {
                     //add the time and route to travel from start node to first pick node
+                    System.out.println("GOT INTO SMALLER ELSE");
                     
                     String[] firstPickNodeSplit = firstPickNode.split(",");
                     Double firstPickNodeXCoord = Double.parseDouble(firstPickNodeSplit[0]);
@@ -379,10 +385,14 @@ public class TwiceAroundTheTree {
                     totalTime += distFromStartNodeToFirstPickNode;
                     routeFromStartToFirstPickNode = startNodeOfThisRoute + "-" + firstPickNodeXCoord + "," + startNodeYCoord + "," + startNodeZCoord + "-" + firstPickNode;
                 }
+                System.out.println("Pick path from " + startNodeOfThisRoute + "to" + firstPickNode + ": " + routeFromStartToFirstPickNode);
+                
                 //add the time and route to travel from last pick node to last node
                 String lastNode = lastPickNodeXCoord + "," + "1.0,0.0";
                 totalTime += (Math.abs(lastPickNodeYCoord - 1.0) * distOfOneUnitOfYCoordInMeters * mheTravelTime + lastPickNodeZCoord * mheLiftingTime);
+                System.out.println("Pick path from " + thisFinalRouteSplit[thisFinalRouteSplit.length - 1] + "to" + lastNode + ": " + routeFromStartToFirstPickNode);
 
+                //System.out.println("route from start to pick node: " + routeFromStartToFirstPickNode);
                 thisFinalRoute = routeFromStartToFirstPickNode + "-" + thisFinalRoute + lastNode;
 
                 System.out.println("this route" + thisFinalRoute + " ---- TATT time for this route: " + totalTime);
@@ -392,8 +402,8 @@ public class TwiceAroundTheTree {
                 startNodeOfThisRoute = lastNode;
                 newRoute = true;
                 totalCapacityOfThisRoute = 0;
-
-                
+                thisFinalRoute = "";
+                totalTime = 0.0;
             }
             
         }

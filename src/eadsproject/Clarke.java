@@ -644,8 +644,24 @@ public class Clarke {
                     } else {
                         thisPath = nextNode + "to" + thisNode;
                         System.out.println("this path: " + thisPath);
-                        thisRouteTotalTime += (Double) timeFromPickItemToPickItem.get(thisPath);
+                        if ( timeFromPickItemToPickItem.get(thisPath) != null) {
+                            thisRouteTotalTime += (Double) timeFromPickItemToPickItem.get(thisPath);
+                        } else {
+                            String[] thisNodeSplit = thisNode.split(",");
+                            String[] nextNodeSplit = nextNode.split(",");
+                            Double thisNodeX = Double.parseDouble(thisNodeSplit[0]);
+                            Double thisNodeY = Double.parseDouble(thisNodeSplit[1]);
+                            Double thisNodeZ = Double.parseDouble(thisNodeSplit[2]);
+                            
+                            Double nextNodeX = Double.parseDouble(nextNodeSplit[0]);
+                            Double nextNodeY = Double.parseDouble(nextNodeSplit[1]);
+                            Double nextNodeZ = Double.parseDouble(nextNodeSplit[2]);
+                            
+                            thisRouteTotalTime += ((Math.abs(thisNodeY - nextNodeY)*distOfOneUnitOfYCoordInMeters + Math.abs(thisNodeX - nextNodeX)* distOfOneUnitOfYCoordInMeters) * mheTravelTime + Math.abs(thisNodeZ - nextNodeZ) * mheLiftingTime);
+               
+                        }
                         //System.out.println("route key: " + thisPath + ", time: " + timeFromPickItemToPickItem.get(thisPath) + " --- total time so far: " + thisRouteTotalTime);
+                        
                     }
                     
                 }
@@ -660,7 +676,7 @@ public class Clarke {
                lastNodeOfPrevRoute = lastNode;
                
                //System.out.println("time frm last pick node to last node: " + (Math.abs(lastPickNodeY - lastNodeY)*distOfOneUnitOfYCoordInMeters + Math.abs(lastPickNodeZ - lastNodeZ)));
-               thisRouteTotalTime += (Math.abs(lastPickNodeY - lastNodeY)*distOfOneUnitOfYCoordInMeters + Math.abs(lastPickNodeZ - lastNodeZ));
+               thisRouteTotalTime += (Math.abs(lastPickNodeY - lastNodeY)*distOfOneUnitOfYCoordInMeters * mheTravelTime + Math.abs(lastPickNodeZ - lastNodeZ) * mheLiftingTime);
                
                 //lastNodeOfPrevRoute = lastNode;
                //System.out.println("route " + finalRoute + " total time: " + thisRouteTotalTime); 

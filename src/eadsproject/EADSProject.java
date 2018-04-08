@@ -330,7 +330,25 @@ public class EADSProject extends Application {
                         System.out.println("size: " + minSpanMap.keySet().size());
                         System.out.println(minSpanMap);
                         
-                        System.out.println("TATT route: " + tatt.getMinimumSpanningTree(minSpanMap, startingPt, intialSolution, ptToPtRouteAndTimeArr, pickItemCapacityMap, Double.parseDouble(mheCapacityText.getText()), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText())));
+                        HashMap TATTResult = tatt.getMinimumSpanningTree(minSpanMap, startingPt, intialSolution, ptToPtRouteAndTimeArr, pickItemCapacityMap, Double.parseDouble(mheCapacityText.getText()), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
+                        System.out.println("TATT route: " + TATTResult);
+                        
+                        Set modifiedTATTRoutesKeySet = TATTResult.keySet();
+                        ArrayList<String> listOfTATTRoutes = new ArrayList<>();
+                        listOfTATTRoutes.addAll(modifiedTATTRoutesKeySet);
+
+                        
+                        System.out.println("Local search TATT routes and time:");
+                        TreeMap<String, Double> modifiedTATTRoutes = new TreeMap<>(TATTResult);
+                        
+                        
+                        
+                        if (finalRoutes.size() <= 3) {
+                            //System.out.println("local search result: "+ modifiedRoutes);
+                        }
+                        
+                        TreeMap<String, Double> tattRouteInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, modifiedTATTRoutes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
+                        vr.startResult(modifiedTATTRoutes,tattRouteInOriginalLocationMap);
                         
                     } 
                 }
