@@ -437,8 +437,8 @@ public class Clarke {
                                 for (int i = anotherRouteSplit.length -1; i >= 0; i--) {
                                     flippedAnotherRoute += anotherRouteSplit[i] + "-";
                                 }
-
-                                newRoute += flippedAnotherRoute;
+                                flippedAnotherRoute = flippedAnotherRoute.substring(0, flippedAnotherRoute.length() - 1);
+                                newRoute += "-" + flippedAnotherRoute;
                                 System.out.println("new route 438: " + thisItem + "//" + thisRoute + "---" + anotherItem + "//" + anotherRoute + ": " + newRoute);
                             }
                             
@@ -471,7 +471,7 @@ public class Clarke {
                     } 
                     //if thisItem and anotherItem appear at different ends of their own routes, just need to merge the 2 routes without flipping
                     else if ((thisRouteSplit[0].equals(thisItem) && anotherRouteSplit[anotherRouteSplit.length - 1].equals(anotherItem)) || (thisRouteSplit[thisRouteSplit.length - 1].equals(thisItem) && anotherRouteSplit[0].equals(anotherItem))) {
-                        
+                        System.out.println("different ends: " + "this item: " + thisItem + " -- this route: " + thisRoute + "/// another item: " + anotherItem + "--- another route: " + anotherRoute);
                         if (thisRouteSplit[0].equals(thisItem)) { //if thisItem appears at the start of its route and anotherItem appears at the end, we have new route = another route + this route
                             newRoute = anotherRoute + "-" + thisRoute;
                         } else {
