@@ -462,10 +462,10 @@ public class Clarke {
                                 for (int i = thisRouteSplit.length -1; i >= 0; i--) {
                                     flippedThisRoute += thisRouteSplit[i] + "-";
                                 }
-                                
-                                newRoute += flippedThisRoute;
-                                System.out.println("new route 463: " + newRoute);
-                                
+                                flippedThisRoute = flippedThisRoute.substring(0, flippedThisRoute.length() - 1);
+                                newRoute += "-" + flippedThisRoute;
+                                System.out.println("new route 467: " + thisItem + "//" + thisRoute + "---" + anotherItem + "//" + anotherRoute + ": " + newRoute);
+                            
                             }
                         }
                     } 

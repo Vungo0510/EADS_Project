@@ -116,14 +116,20 @@ public class VisualisationResult {
                          
                 
                 
-                 System.out.println(nodesInOriginalLocationRoute + "  nodesInOriginalLocationRoute");
+                 //System.out.println(nodesInOriginalLocationRoute + "  nodesInOriginalLocationRoute");
                  Double nodesInOriginalLocationRouteXCoord = 0.0;
                  Double nodesInOriginalLocationRouteYCoord = 0.0;
                  
                  if(nodesInOriginalLocationRoute.contains(",")){
                      // this is either a start node or corner nodes
                     nodesInOriginalLocationRouteXCoord = Double.parseDouble(nodesInOriginalLocationRoute.split(",")[0]);
-                    nodesInOriginalLocationRouteYCoord = Double.parseDouble(nodesInOriginalLocationRoute.split(",")[2]); 
+                    
+                    if (nodesInOriginalLocationRoute.split(",")[2].contains("M") || nodesInOriginalLocationRoute.split(",")[2].contains("m")) {
+                        nodesInOriginalLocationRouteYCoord = Double.parseDouble(nodesInOriginalLocationRoute.split(",")[2].substring(0, nodesInOriginalLocationRoute.split(",")[2].length() - 1)); 
+                    } else {
+                        nodesInOriginalLocationRouteYCoord = Double.parseDouble(nodesInOriginalLocationRoute.split(",")[2]); 
+                    }
+                    
                  
                  
                  }else{

@@ -339,7 +339,7 @@ public class TwiceAroundTheTree {
                         }
                     }
                 }
-                System.out.println("Pick path from " + pickNode + "to" + nextPickNode + ": " + routeFromThisNodeToNextPickNode);
+                //System.out.println("Pick path from " + pickNode + "to" + nextPickNode + ": " + routeFromThisNodeToNextPickNode);
                 if (i != minimumSpanningTree.size() - 2) {
                     //System.out.println("this route before cut: " + routeFromThisNodeToNextPickNode);
                     routeFromThisNodeToNextPickNode = routeFromThisNodeToNextPickNode.substring(0, routeFromThisNodeToNextPickNode.lastIndexOf("-"));
@@ -348,7 +348,7 @@ public class TwiceAroundTheTree {
 
                 thisFinalRoute += routeFromThisNodeToNextPickNode + "-";  
                 finalRoutesTimeMap.put(thisFinalRoute, totalTime);
-                System.out.println("final route so far: " + thisFinalRoute);
+                //System.out.println("final route so far: " + thisFinalRoute);
             } else {
                 finalRoutesTimeMap.remove(thisFinalRoute);
                 
