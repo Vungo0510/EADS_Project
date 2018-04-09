@@ -318,7 +318,7 @@ public class LocalSearch {
 
                         }else if(nodeYCoord.equals("77.0")){                       
                             // converting the last corner node at y coordinate = 77
-                            nodeYCoord = "56";
+                            nodeYCoord = "57.0";
 
 
                         }else if(nodeYCoord.equals("35.0")){                       
