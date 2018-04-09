@@ -38,6 +38,7 @@ import javafx.scene.text.Text;
 import javafx.scene.control.TextField; 
 import javafx.scene.control.ToggleGroup;  
 import javafx.scene.control.ToggleButton; 
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
@@ -60,6 +61,7 @@ public class EADSProject extends Application {
       
       Text mheCapacityError = new Text();
       mheCapacityError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
+      mheCapacityError.setFill(Paint.valueOf("red"));
       
       //Label for num of MHE
       Text numOfMHELabel = new Text("Total number of MHEs"); 
@@ -69,6 +71,7 @@ public class EADSProject extends Application {
       
       Text numOfMHEError = new Text();
       numOfMHEError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
+      numOfMHEError.setFill(Paint.valueOf("red"));
       
       //Label for num of MHE
       Text mheTravelTimeLabel = new Text("Time taken for MHE to travel 1 meter"); 
@@ -77,25 +80,36 @@ public class EADSProject extends Application {
       TextField mheTravelTimeText = new TextField(); 
       
       Text mheTravelTimeError = new Text();
-      numOfMHEError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
-      
+      mheTravelTimeError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
+      mheTravelTimeError.setFill(Paint.valueOf("red"));
       //Label for num of MHE
       Text mheLiftingTimeLabel = new Text("Time taken for MHE to lift/lower 1 meter"); 
      
+      //Label for time unit (seconds)
+      Text mheTravelTimeUnitLabel = new Text("(seconds)");
+      
+      //Label for time unit (seconds)
+      Text mheLiftingTimeUnitLabel = new Text("(seconds)");
+      
       //Text field for num of MHE 
       TextField mheLiftingTimeText = new TextField(); 
       
       Text mheLiftingTimeError = new Text();
       mheLiftingTimeError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
-      
+      mheLiftingTimeError.setFill(Paint.valueOf("red"));
       //Label for starting point
       Text startingPointLabel = new Text("Current MHE position"); 
      
       //Text field for num of MHE 
       TextField startingPointText = new TextField(); 
       
+      //Label for starting point
+      Text startingPointNote = new Text("in format: Lane,Rack");
+      
+      //Starting point error text
       Text startingPointError = new Text();
       startingPointError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
+      startingPointError.setFill(Paint.valueOf("red"));
       
       FileChooser fileChooser = new FileChooser();
       // Set extension filter
@@ -110,12 +124,15 @@ public class EADSProject extends Application {
       
       Text pickListError = new Text();
       pickListError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
-      
+      pickListError.setFill(Paint.valueOf("red"));
       //Label for corner node csv file chooser
       Text cornerNodesCSVLabel = new Text("Corner nodes CSV file"); 
       Button chooseCornerNodesBtn = new Button("Upload Corner nodes...");
       Text cornerNodeError = new Text();
       cornerNodeError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
+      cornerNodeError.setFill(Paint.valueOf("red"));
+
+      
       
       Text pickListFileName = new Text();
       pickListFileName.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
@@ -181,7 +198,7 @@ public class EADSProject extends Application {
                         Integer.parseInt(startingPtSplit[1].substring(0, startingPtSplit[1].length() - 1));
                     } catch (NumberFormatException nfe) {
                         hasError = true;
-                        mheCapacityError.setText("X and Y coordinate of starting point must be an integer");
+                        startingPointError.setText("X and Y coordinate of starting point must be an integer");
                     }
                     
                     if (mheCapacityText.getText().equals("")) {
@@ -205,7 +222,7 @@ public class EADSProject extends Application {
                         Integer.parseInt(mheCapacityText.getText());
                     } catch (NumberFormatException nfe) {
                         hasError = true;
-                        numOfMHEError.setText("MHE capacity must be an integer");
+                        numOfMHEError.setText("Number of MHE must be an integer");
                     }
                     
                     if (mheTravelTimeText.getText().equals("")) {
@@ -361,7 +378,7 @@ public class EADSProject extends Application {
       GridPane gridPane = new GridPane();    
       
       //Setting size for the pane 
-      gridPane.setMinSize(600, 400); 
+      gridPane.setMinSize(800, 400); 
        
       //Setting the padding    
       gridPane.setPadding(new Insets(10, 10, 10, 10));  
@@ -385,16 +402,20 @@ public class EADSProject extends Application {
       
       gridPane.add(mheTravelTimeLabel, 0, 4);       
       gridPane.add(mheTravelTimeText, 1, 4); 
+      gridPane.add(mheTravelTimeUnitLabel, 2, 4);
       gridPane.add(mheTravelTimeError, 1, 5);
       
       gridPane.add(mheLiftingTimeLabel, 0, 6);       
-      gridPane.add(mheLiftingTimeText, 1, 6); 
+      gridPane.add(mheLiftingTimeText, 1, 6);
+      gridPane.add(mheLiftingTimeUnitLabel, 2, 6);
       gridPane.add(mheLiftingTimeError, 1, 7);
       
       
       gridPane.add(startingPointLabel, 0, 8);       
       gridPane.add(startingPointText, 1, 8); 
+      gridPane.add(startingPointNote, 2, 8); 
       gridPane.add(startingPointError, 1, 9);
+       
               
       gridPane.add(pickingListCSVLabel, 0, 10); 
       gridPane.add(choosePickingListBtn, 1, 10); 
@@ -422,8 +443,11 @@ public class EADSProject extends Application {
       mheCapacityUnitLabel.setStyle("-fx-font: normal 15px 'serif' ");
       numOfMHELabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
       mheTravelTimeLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
+      mheTravelTimeUnitLabel.setStyle("-fx-font: normal 15px 'serif' "); 
+      mheLiftingTimeUnitLabel.setStyle("-fx-font: normal 15px 'serif' "); 
       mheLiftingTimeLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
       startingPointLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
+      startingPointNote.setStyle("-fx-font: normal 15px 'serif' "); 
       pickingListCSVLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
       cornerNodesCSVLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
        
