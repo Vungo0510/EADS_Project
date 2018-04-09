@@ -314,10 +314,11 @@ public class EADSProject extends Application {
                         }
                         
                         
-                       
+                       //visualise result for Local Search
                         TreeMap<String, Double> routeInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, modifiedRoutes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
+                        String localSearchResultsName = " Local Search ";
                         VisualisationResult vr = new VisualisationResult();
-                        vr.startResult(modifiedRoutes,routeInOriginalLocationMap);
+                        vr.startResult(modifiedRoutes,routeInOriginalLocationMap, localSearchResultsName);
                         
                         
                         
@@ -348,7 +349,9 @@ public class EADSProject extends Application {
                         }
                         
                         TreeMap<String, Double> tattRouteInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, modifiedTATTRoutes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
-                        vr.startResult(modifiedTATTRoutes,tattRouteInOriginalLocationMap);
+                        String TATTName = " TATT";
+                        //visualise results for TATT
+                        vr.startResult(modifiedTATTRoutes,tattRouteInOriginalLocationMap, TATTName);
                         
                     } 
                 }

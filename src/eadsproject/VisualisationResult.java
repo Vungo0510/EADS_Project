@@ -28,7 +28,7 @@ import javafx.scene.chart.XYChart.*;
          
 public class VisualisationResult { 
   // @Override 
-   public void startResult(TreeMap<String, Double> modifiedRoutes,  TreeMap<String, Double> routeInOriginalLocationMap) {     
+   public void startResult(TreeMap<String, Double> modifiedRoutes,  TreeMap<String, Double> routeInOriginalLocationMap, String Name) {     
         Stage stage = new Stage(); 
                        
         // Creating a border pane
@@ -37,7 +37,7 @@ public class VisualisationResult {
         borderPane.setTop(text);     
         
         double textX = 0.0;
-        double textY = 10.0;
+        double textY = 24.0;
         
         
         //Creating a top pane object  
@@ -45,7 +45,8 @@ public class VisualisationResult {
         
         Text localSearchText = new Text();
         
-        Text titleText = new Text(textX, textY, " RESULTS: ");
+        Text titleText = new Text(textX, textY, Name + " RESULTS: ");
+        titleText.setFont( Font.font("Arial", 20.0));
         
         topPane.getChildren().addAll(titleText);
        
@@ -61,12 +62,16 @@ public class VisualisationResult {
 
             double totalTimeInSecs = routeInOriginalLocationMap.get(thisOriginalLocationRoute);
             localSearchText = new Text(textX, textY, " Route to take: " + thisOriginalLocationRoute);
+         
+
             textY +=15.0;
             Text totalTimeInSecsText = new Text(textX, textY, " Total time: " + Double.toString(totalTimeInSecs));
-                 topPane.getChildren().addAll(localSearchText);
-                 topPane.getChildren().addAll(totalTimeInSecsText);
+            //setting font size for route and time taken
+            localSearchText.setFont( Font.font("Arial", 15.0));
+            totalTimeInSecsText.setFont( Font.font("Arial", 15.0));
+            topPane.getChildren().addAll(localSearchText);
+            topPane.getChildren().addAll(totalTimeInSecsText);
 
-           // hbox.getChildren().addAll(localSearchText, totalTimeInSecsText);
         }
         
         
