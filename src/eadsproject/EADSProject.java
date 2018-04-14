@@ -290,10 +290,12 @@ public class EADSProject extends Application {
 
                         ArrayList<HashMap> intialSolution = c.getInitialSolution(pickingList, startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
                         HashMap<String, Double> timeFromStartPtToAllPt = intialSolution.get(0);
-
+                        HashMap<String, String> routeFromStartPtToAllPt = intialSolution.get(1);
+                        
                         ArrayList<HashMap> ptToPtRouteAndTimeArr = c.getPointToPointTime(pickingList, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
                         HashMap<String, Double> timeAmongPickItems = ptToPtRouteAndTimeArr.get(0);
-
+                        HashMap<String, String> routeAmongPickItems = ptToPtRouteAndTimeArr.get(1);
+                        
                         HashMap<String, Double> savingsMap = c.getSavingsMap(pickingList, startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
 
                         HashMap<String, String> solutionMap = c.getSolution(pickItemCapacityMap, savingsMap, Double.parseDouble(mheCapacityText.getText()), startingPt);
@@ -320,21 +322,34 @@ public class EADSProject extends Application {
                         System.out.println(finalRoutes);
                         
                         System.out.println("Final routes and time:");
-                        System.out.println(c.getTimeOfFinalRoutes(pickingList, finalRoutes, startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText())));
+                        HashMap unmodifiedFinalRoutesTime = c.getTimeOfFinalRoutes(pickingList, finalRoutes, startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
+                        System.out.println(unmodifiedFinalRoutesTime);
                         
-                        System.out.println("Local search routes and time:");
+                        TreeMap<String, Double> unmodifiedFinalRoutesTimeTreeMap = new TreeMap<>(unmodifiedFinalRoutesTime);
                         LocalSearch ls = new LocalSearch();
-                        TreeMap<String, Double> modifiedRoutes = ls.localSearch(finalRoutes, pickingList , startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
                         
-                        if (finalRoutes.size() <= 3) {
-                            System.out.println("local search result: "+ modifiedRoutes);
-                        }
+                        //visualise result for unmodfied routes (routes before applying local search)
+                        TreeMap<String, Double> unmodifiedRoutesWithCornerNodes = ls.addCornerNodesToRoutes(unmodifiedFinalRoutesTimeTreeMap, routeFromStartPtToAllPt, routeAmongPickItems);
+                        System.out.println("unmodified routes w corner nodes: ");
+                        System.out.println(unmodifiedRoutesWithCornerNodes);
+                        TreeMap<String, Double> befLSRouteInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, unmodifiedRoutesWithCornerNodes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
+                        String clarkeWrightName = " Clarke-Wright (without local search)";
+                        VisualisationResult vr = new VisualisationResult();
+                        vr.startResult(unmodifiedRoutesWithCornerNodes,befLSRouteInOriginalLocationMap, clarkeWrightName);
                         
+                        //----- local search section
+                        System.out.println("Local search route and time (before adding corner nodes):");
+                        TreeMap<String, Double> lsRoutesMap = ls.localSearch(finalRoutes, pickingList , startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
+                        System.out.println(lsRoutesMap);
+                        
+                        System.out.println("Local search route and time (AFTER adding corner nodes): ");
+                        TreeMap<String, Double> modifiedRoutes = ls.addCornerNodesToRoutes(lsRoutesMap, routeFromStartPtToAllPt, routeAmongPickItems);
+                        System.out.println(modifiedRoutes);
                         
                        //visualise result for Local Search
                         TreeMap<String, Double> routeInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, modifiedRoutes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
                         String localSearchResultsName = " Local Search ";
-                        VisualisationResult vr = new VisualisationResult();
+                        vr = new VisualisationResult();
                         vr.startResult(modifiedRoutes,routeInOriginalLocationMap, localSearchResultsName);
                         
                         
@@ -369,6 +384,9 @@ public class EADSProject extends Application {
                         String TATTName = " TATT";
                         //visualise results for TATT
                         vr.startResult(modifiedTATTRoutes,tattRouteInOriginalLocationMap, TATTName);
+                        
+                        //--local search for TATT
+                        
                         
                     } 
                 }

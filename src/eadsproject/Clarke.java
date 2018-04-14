@@ -586,7 +586,7 @@ public class Clarke {
                     if (timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) != null) {
                         thisRouteTotalTime += (Double) timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey);
                         //System.out.println("Start: " + routeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey));
-                        //System.out.println("start 1 key: " + startNodeToFirstPickNodeKey + ", time: " + timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) + " --- total time so far: " + thisRouteTotalTime);
+                        System.out.println("start 1 key: " + startNodeToFirstPickNodeKey + ", time: " + timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) + " --- total time so far: " + thisRouteTotalTime);
                     }
                     calculated = true;
                 } else {
@@ -595,12 +595,12 @@ public class Clarke {
                     if (timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]) != null) {
                         thisRouteTotalTime += (Double) timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]);
                         //System.out.println("route detail: " + routeFromPickItemToPickItem.get(finalRouteSplit[0] + "to" + finalRouteSplit[1]));
-                        //System.out.println("start 2 key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", time: " + timeFromStartPtToPickItem.get(timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1])) + " --- total time so far: " + thisRouteTotalTime);
+                        System.out.println("start 2 key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", time: " + timeFromStartPtToPickItem.get(timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1])) + " --- total time so far: " + thisRouteTotalTime);
                         calculated = true;
                     } else if (timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]) != null) {
                         thisRouteTotalTime += (Double) timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]);
                         //System.out.println("route detail: " + routeFromPickItemToPickItem.get(finalRouteSplit[1] + "to" + finalRouteSplit[0]));
-                        //System.out.println("start 3 key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", time: " + timeFromStartPtToPickItem.get(timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0])) + " --- total time so far: " + thisRouteTotalTime);
+                        System.out.println("start 3 key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", time: " + timeFromStartPtToPickItem.get(timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0])) + " --- total time so far: " + thisRouteTotalTime);
                         calculated = true;
                     }
                     /*if (!calculated) {
@@ -643,7 +643,7 @@ public class Clarke {
                         //System.out.println("route key: " + thisPath + ", time: " + timeFromPickItemToPickItem.get(thisPath) + " --- total time so far: " + thisRouteTotalTime);
                     } else {
                         thisPath = nextNode + "to" + thisNode;
-                        System.out.println("this path: " + thisPath);
+                        //System.out.println("this path: " + thisPath);
                         if ( timeFromPickItemToPickItem.get(thisPath) != null) {
                             thisRouteTotalTime += (Double) timeFromPickItemToPickItem.get(thisPath);
                         } else {
@@ -660,7 +660,7 @@ public class Clarke {
                             thisRouteTotalTime += ((Math.abs(thisNodeY - nextNodeY)*distOfOneUnitOfYCoordInMeters + Math.abs(thisNodeX - nextNodeX)* distOfOneUnitOfYCoordInMeters) * mheTravelTime + Math.abs(thisNodeZ - nextNodeZ) * mheLiftingTime);
                
                         }
-                        //System.out.println("route key: " + thisPath + ", time: " + timeFromPickItemToPickItem.get(thisPath) + " --- total time so far: " + thisRouteTotalTime);
+                        System.out.println("route key: " + thisPath + ", time: " + timeFromPickItemToPickItem.get(thisPath) + " --- total time so far: " + thisRouteTotalTime);
                         
                     }
                     
@@ -679,7 +679,7 @@ public class Clarke {
                thisRouteTotalTime += (Math.abs(lastPickNodeY - lastNodeY)*distOfOneUnitOfYCoordInMeters * mheTravelTime + Math.abs(lastPickNodeZ - lastNodeZ) * mheLiftingTime);
                
                 //lastNodeOfPrevRoute = lastNode;
-               //System.out.println("route " + finalRoute + " total time: " + thisRouteTotalTime); 
+               System.out.println("route " + finalRoute + " total time: " + thisRouteTotalTime); 
                
                finalRoutesDistHashMap.put(finalRoute, thisRouteTotalTime);
             }
