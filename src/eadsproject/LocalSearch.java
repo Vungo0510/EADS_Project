@@ -31,6 +31,10 @@ public class LocalSearch {
         
         TreeMap<String, Double> localSearchRoutesMap = new TreeMap<>();
         
+        String[] startPtSplit = startingPoint.split(","); //need to add Z coordinate to starting point string and convert X Y coordinates from integer to double
+        startingPoint = Double.parseDouble(startPtSplit[0]) + "," + Double.parseDouble(startPtSplit[1]) + ",0.0"; 
+            
+        
         for(int i = 0; i < finalRoutes.size(); i++){
             // loop through the arrayList of finalRoutes to do local search on each route
             String finalRoute = finalRoutes.get(i);
@@ -76,7 +80,25 @@ public class LocalSearch {
                     
                     // calculate total dist of new route
                     double totalDist = 0.0;
-                    double distOfStartPtToFirstPickNode = distOfStartPtToAllPt.get(replicateFinalRouteArr[1]);
+                    double distOfStartPtToFirstPickNode = 0.0;
+                    
+                    
+                    if (replicateFinalRouteArr[0].equals(startingPoint)) { //if this is the first route
+                        distOfStartPtToFirstPickNode = distOfStartPtToAllPt.get(replicateFinalRouteArr[1]);
+                    } else { // if this is not the first route, starting point will be last node of previous route
+                        //System.out.println("HEEEREE");
+                        String[] firstNodeSplit = replicateFinalRouteArr[0].split(",");
+                        String[] firstPickNodeSplit = replicateFinalRouteArr[1].split(",");
+                        
+                        Double firstNodeXCoord = Double.parseDouble(firstNodeSplit[0]);
+                        Double firstPickNodeXCoord = Double.parseDouble(firstPickNodeSplit[0]);
+                        Double firstPickNodeYCoord = Double.parseDouble(firstPickNodeSplit[1]);
+                        Double firstPickNodeZCoord = Double.parseDouble(firstPickNodeSplit[2]);
+                        
+                        distOfStartPtToFirstPickNode = (Math.abs(firstNodeXCoord - firstPickNodeXCoord) * 1.425 + Math.abs(firstPickNodeYCoord - 1) * 0.9) * mheTravelTime + firstPickNodeZCoord * mheLiftingTime;
+                        System.out.println("nodes: " + firstNodeXCoord + "--" + firstPickNodeXCoord  + "--" + firstPickNodeYCoord + "--" + firstPickNodeZCoord);
+                    }
+                    System.out.println("start to first pick: " + distOfStartPtToFirstPickNode);
                     totalDist += distOfStartPtToFirstPickNode;
                    
                     
@@ -96,6 +118,7 @@ public class LocalSearch {
                         }
                     
                         totalDist +=distBetweenPickNodes;
+                        System.out.println("pick to pick: " + distBetweenPickNodes + "-- dist so far: " + totalDist);
                         //System.out.println("dist so far: " +totalDist );
                       
                     
@@ -104,16 +127,17 @@ public class LocalSearch {
                     String lastPickNode = replicateFinalRouteArr[replicateFinalRouteArr.length-2];
                     double ycoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[1]);
                     double zcoordOfLastPickNode = Double.parseDouble(lastPickNode.split(",")[2]);
-                    totalDist += zcoordOfLastPickNode ;
+                    double distFromLastPickNodeToLastNode = (ycoordOfLastPickNode - 1.0)* 0.9 * mheTravelTime + (zcoordOfLastPickNode * mheLiftingTime);
                  
-                    totalDist += (ycoordOfLastPickNode - 1.0)*0.9;
+                    totalDist += distFromLastPickNodeToLastNode;
+                    System.out.println("last pick to last: " + distFromLastPickNodeToLastNode +"--" + totalDist);
                     
                     if(totalDist < bestDist){
                         String thisLocalSearchRoute = "";
-                        System.out.println("Stores j " + j);
+                        //System.out.println("Stores j " + j);
                         //finalAns = replicateFinalRouteArr;
                         finalRouteTotalDist = totalDist;
-                        System.out.println(" stored j route: " );
+                        //System.out.println(" stored j route: " );
                         
                         //finalAns.clear();
                         //finding the x and y coord of last pick node
@@ -130,8 +154,8 @@ public class LocalSearch {
                         }
                         thisLocalSearchRoute += changePackNode;
                         
-                        System.out.println("best this loc search route so far: " + thisLocalSearchRoute);
-                        System.out.println("best dist so far for this route: " + totalDist);
+                        //System.out.println("best this loc search route so far: " + thisLocalSearchRoute);
+                        //System.out.println("best dist so far for this route: " + totalDist);
                         bestLocalSearchRoute = thisLocalSearchRoute;
                         bestDist = totalDist;
                         
@@ -154,20 +178,25 @@ public class LocalSearch {
     
     }
     
-    public TreeMap<String,Double> addCornerNodesToRoutes (TreeMap<String,Double> routesMap, HashMap<String, String> routeOfStartPtToAllPt, HashMap<String, String> routeFromCurrPickNodeToOtherPickNode) {
+    public TreeMap<String,Double> addCornerNodesToRoutes (TreeMap<String,Double> routesMap, HashMap<String, String> routeOfStartPtToAllPt, HashMap<String, String> routeFromCurrPickNodeToOtherPickNode, String startingPoint) {
         TreeMap<String, Double> modifiedRoutes = new TreeMap<String, Double>(); //to store all the routes after local search is completed
         String modifiedRouteStr = "";
         Set lsRoutesKeySet = routesMap.descendingKeySet();
+        System.out.println("routes map keyset: " + lsRoutesKeySet);
+        
         ArrayList<String> finalRoutes = new ArrayList<String>(lsRoutesKeySet);
-        System.out.println("Final routes arr: " + finalRoutes);
+        //System.out.println("Final routes arr: " + finalRoutes);
         
         for (int i = 0; i < finalRoutes.size(); i++) {
             String finalAnsWithCornerNodes = "";
             
             ArrayList<String> finalAns = new ArrayList<String>();
             String thisRoute = finalRoutes.get(i);
-            //System.out.println("this route iz: " + thisRoute);
+            System.out.println("this route iz: " + thisRoute);
             
+            String[] startPtSplit = startingPoint.split(","); //need to add Z coordinate to starting point string
+            startingPoint = Double.parseDouble(startPtSplit[0]) + "," + Double.parseDouble(startPtSplit[1]) + ",0.0"; 
+            System.out.println("starting point after edit is: " + startingPoint);
             
             Double finalRouteTotalDist = routesMap.get(thisRoute);
             String[] thisRouteSplit = thisRoute.split("-");
@@ -176,17 +205,22 @@ public class LocalSearch {
                 finalAns.add(node);
             }
             
-            if(i ==0){
+            if(finalAns.get(0).equals(startingPoint)){ //this is the first route with current MHE location as start node
                 String routeFromStartNodeToFirstPickNode = routeOfStartPtToAllPt.get( finalAns.get(1));
                 routeFromStartNodeToFirstPickNode = routeFromStartNodeToFirstPickNode.substring(0, routeFromStartNodeToFirstPickNode.lastIndexOf("-"));
                 finalAnsWithCornerNodes +=routeFromStartNodeToFirstPickNode + "-";
-                //System.out.println("start node is starting pt, first pick node: " + finalAns.get(1) + " - first inter. route: " + routeFromStartNodeToFirstPickNode);
+                System.out.println("start node is starting pt, first pick node: " + finalAns.get(1) + " - first inter. route: " + routeFromStartNodeToFirstPickNode);
                 for(int p = 1; p< finalAns.size()-2; p++){
+                    
                         String node = finalAns.get(p);
                         String nxtNode = finalAns.get(p+1);
+                        Double nodeXCoord = Double.parseDouble(node.split(",")[0]);
+                        Double nxtNodeXCoord = Double.parseDouble(nxtNode.split(",")[0]);
                          //System.out.println(node + " node ");
                          //System.out.println(nxtNode + " nxt node ");
+                    if (Math.abs(nodeXCoord - nxtNodeXCoord) > 1) {
                         String intermediateRouteWithCornerNode = routeFromCurrPickNodeToOtherPickNode.get(node +"to" +nxtNode);
+                        
                         if(intermediateRouteWithCornerNode == null){
                              intermediateRouteWithCornerNode = routeFromCurrPickNodeToOtherPickNode.get(nxtNode +"to" + node);
                              //System.out.println("before flip: " + intermediateRouteWithCornerNode);
@@ -220,7 +254,9 @@ public class LocalSearch {
                             if(p!= finalAns.size()-1){
                                 modifiedRouteStr +="-";
                             }
-
+                    } else {
+                        finalAnsWithCornerNodes += node + "-";
+                    }
                 }
                 String node = finalAns.get(finalAns.size()-2);
                 String nxtNode = finalAns.get(finalAns.size()-1);
@@ -235,45 +271,53 @@ public class LocalSearch {
 
                 String startNodeOfRoute2 = finalAns.get(0);
                 String firstPickNodeOfRoute2 = finalAns.get(1);
-
+                
                 String xCoordOfFirstPickNode =firstPickNodeOfRoute2.split(",")[0];
                 String cornerNodeBetweenStartNodeAndFirstPickNode = xCoordOfFirstPickNode + ",1.0,0.0";
                 String firstIntermediateRoute = startNodeOfRoute2 + "-" + cornerNodeBetweenStartNodeAndFirstPickNode + "-";
-                //System.out.println("start node 2: " + startNodeOfRoute2 +" - first pick node 2: " + firstPickNodeOfRoute2 + " - first inter. route: " + firstIntermediateRoute);
+                System.out.println("start node 2: " + startNodeOfRoute2 +" - first pick node 2: " + firstPickNodeOfRoute2 + " - first inter. route: " + firstIntermediateRoute);
                 
                 finalAnsWithCornerNodes +=firstIntermediateRoute;
-                 for(int p = 1; p< finalAns.size()-2; p++){
-                        String node = finalAns.get(p);
-                        String nxtNode = finalAns.get(p+1);
+                
+                for(int p = 1; p< finalAns.size()-2; p++){
+                    String node = finalAns.get(p);
+                    String nxtNode = finalAns.get(p+1);
+                    Double nodeXCoord = Double.parseDouble(node.split(",")[0]);
+                    Double nxtNodeXCoord = Double.parseDouble(nxtNode.split(",")[0]);
+
+                    if (Math.abs(nodeXCoord - nxtNodeXCoord) > 1) {
                         String intermediateRouteWithCornerNode = routeFromCurrPickNodeToOtherPickNode.get(node +"to" +nxtNode);
                         //System.out.println("key is: " + node +"to" + nxtNode);
                         
                         if(intermediateRouteWithCornerNode == null){
-                             //System.out.println("key is: " + nxtNode +"to" + node);
-                             intermediateRouteWithCornerNode = routeFromCurrPickNodeToOtherPickNode.get(nxtNode +"to" + node);
-                             String[] intermediateRouteWithCornerNodeArr= intermediateRouteWithCornerNode.split("-");
-                             String routeIWant = "";
-                             for(int z = intermediateRouteWithCornerNodeArr.length-1; z >=0; z--){
-                                 routeIWant += intermediateRouteWithCornerNodeArr[z];
-                                 routeIWant+="-";
+                            //System.out.println("key is: " + nxtNode +"to" + node);
+                            intermediateRouteWithCornerNode = routeFromCurrPickNodeToOtherPickNode.get(nxtNode +"to" + node);
+                            String[] intermediateRouteWithCornerNodeArr= intermediateRouteWithCornerNode.split("-");
+                            String routeIWant = "";
+                            for(int z = intermediateRouteWithCornerNodeArr.length-1; z >=0; z--){
+                                routeIWant += intermediateRouteWithCornerNodeArr[z];
+                                routeIWant+="-";
 
 
-                             }
-                            routeIWant= routeIWant.substring(0,routeIWant.length()-1);
-                             intermediateRouteWithCornerNode = routeIWant;
-
-
-
-                        }
-                            // cut off the second pick node
-                            int indexOfDash = intermediateRouteWithCornerNode.lastIndexOf("-");
-                            intermediateRouteWithCornerNode = intermediateRouteWithCornerNode.substring(0,indexOfDash+1);
-                            finalAnsWithCornerNodes +=intermediateRouteWithCornerNode;
-                            modifiedRouteStr += node;
-                            if(p!= finalAns.size()-1){
-                                modifiedRouteStr +="-";
                             }
+                           routeIWant= routeIWant.substring(0,routeIWant.length()-1);
+                            intermediateRouteWithCornerNode = routeIWant;
 
+
+
+                       }
+                        // cut off the second pick node
+                        int indexOfDash = intermediateRouteWithCornerNode.lastIndexOf("-");
+                        intermediateRouteWithCornerNode = intermediateRouteWithCornerNode.substring(0,indexOfDash+1);
+                        finalAnsWithCornerNodes +=intermediateRouteWithCornerNode;
+                        modifiedRouteStr += node;
+                        if(p!= finalAns.size()-1){
+                            modifiedRouteStr +="-";
+                        }
+                    } else {
+                        finalAnsWithCornerNodes += node + "-";
+                    }
+                        
                 }
 
                 String node = finalAns.get(finalAns.size()-2);
@@ -284,7 +328,7 @@ public class LocalSearch {
 
                 //modifiedRoutes.put(modifiedRouteStr,finalRouteTotalDist);
             }
-            //System.out.println("this route w corner nodes iz: " + finalAnsWithCornerNodes);
+            System.out.println("this route w corner nodes iz: " + finalAnsWithCornerNodes);
             modifiedRoutes.put(finalAnsWithCornerNodes,finalRouteTotalDist);
         }
         return modifiedRoutes;

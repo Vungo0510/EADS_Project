@@ -329,26 +329,26 @@ public class EADSProject extends Application {
                         LocalSearch ls = new LocalSearch();
                         
                         //visualise result for unmodfied routes (routes before applying local search)
-                        TreeMap<String, Double> unmodifiedRoutesWithCornerNodes = ls.addCornerNodesToRoutes(unmodifiedFinalRoutesTimeTreeMap, routeFromStartPtToAllPt, routeAmongPickItems);
+                        TreeMap<String, Double> unmodifiedRoutesWithCornerNodes = ls.addCornerNodesToRoutes(unmodifiedFinalRoutesTimeTreeMap, routeFromStartPtToAllPt, routeAmongPickItems, startingPt);
                         System.out.println("unmodified routes w corner nodes: ");
                         System.out.println(unmodifiedRoutesWithCornerNodes);
                         TreeMap<String, Double> befLSRouteInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, unmodifiedRoutesWithCornerNodes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
-                        String clarkeWrightName = " Clarke-Wright (without local search)";
+                        String clarkeWrightName = "Clarke-Wright (without local search)";
                         VisualisationResult vr = new VisualisationResult();
                         vr.startResult(unmodifiedRoutesWithCornerNodes,befLSRouteInOriginalLocationMap, clarkeWrightName);
                         
                         //----- local search section
                         System.out.println("Local search route and time (before adding corner nodes):");
                         TreeMap<String, Double> lsRoutesMap = ls.localSearch(finalRoutes, pickingList , startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
-                        System.out.println(lsRoutesMap);
+                        System.out.println("THIZ: " + lsRoutesMap);
                         
                         System.out.println("Local search route and time (AFTER adding corner nodes): ");
-                        TreeMap<String, Double> modifiedRoutes = ls.addCornerNodesToRoutes(lsRoutesMap, routeFromStartPtToAllPt, routeAmongPickItems);
+                        TreeMap<String, Double> modifiedRoutes = ls.addCornerNodesToRoutes(lsRoutesMap, routeFromStartPtToAllPt, routeAmongPickItems, startingPt);
                         System.out.println(modifiedRoutes);
                         
                        //visualise result for Local Search
                         TreeMap<String, Double> routeInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, modifiedRoutes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
-                        String localSearchResultsName = " Local Search ";
+                        String localSearchResultsName = "Clarke-Wright After Local Search";
                         vr = new VisualisationResult();
                         vr.startResult(modifiedRoutes,routeInOriginalLocationMap, localSearchResultsName);
                         
