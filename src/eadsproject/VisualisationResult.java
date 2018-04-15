@@ -70,7 +70,8 @@ public class VisualisationResult {
          
 
             textY +=15.0;
-            Text totalTimeInSecsText = new Text(textX, textY, " Total time: " + df.format(totalTimeInSecs));
+            Text totalTimeInSecsText = new Text(textX, textY, " Total time: " + df.format(totalTimeInSecs) + " secs");
+          
             //setting font size for route and time taken
             localSearchText.setFont( Font.font("Arial", 15.0));
             totalTimeInSecsText.setFont( Font.font("Arial", 15.0));

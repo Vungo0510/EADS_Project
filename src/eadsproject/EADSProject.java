@@ -311,7 +311,7 @@ public class EADSProject extends Application {
                         //System.out.println("unmodified routes w corner nodes: ");
                         //System.out.println(unmodifiedRoutesWithCornerNodes);
                         TreeMap<String, Double> befLSRouteInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, unmodifiedRoutesWithCornerNodes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
-                        String clarkeWrightName = "Clarke-Wright (without local search)";
+                        String clarkeWrightName = " Clarke-Wright (without local search)";
                         VisualisationResult vr = new VisualisationResult();
                         vr.startResult(unmodifiedRoutesWithCornerNodes,befLSRouteInOriginalLocationMap, clarkeWrightName);
                         
@@ -326,7 +326,7 @@ public class EADSProject extends Application {
                         
                        //visualise result for Local Search
                         TreeMap<String, Double> routeInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, modifiedRoutes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
-                        String localSearchResultsName = "Clarke-Wright After Local Search";
+                        String localSearchResultsName = " Clarke-Wright After Local Search";
                         vr = new VisualisationResult();
                         vr.startResult(modifiedRoutes,routeInOriginalLocationMap, localSearchResultsName);
                         
