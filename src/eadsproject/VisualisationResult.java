@@ -9,6 +9,7 @@ package eadsproject;
  *
  * @author Cathy
  */
+import java.math.RoundingMode;
 import java.util.*;
 import javafx.application.Application; 
 import javafx.scene.Group; 
@@ -25,11 +26,15 @@ import javafx.scene.shape.Path;
 import javafx.scene.chart.*;
 import javafx.collections.*;
 import javafx.scene.chart.XYChart.*;
+
+import java.text.DecimalFormat;
          
 public class VisualisationResult { 
   // @Override 
    public void startResult(TreeMap<String, Double> modifiedRoutes,  TreeMap<String, Double> routeInOriginalLocationMap, String Name) {     
-        Stage stage = new Stage(); 
+       DecimalFormat df = new DecimalFormat("#.###"); 
+       df.setRoundingMode(RoundingMode.HALF_UP);
+       Stage stage = new Stage(); 
                        
         // Creating a border pane
         BorderPane borderPane = new BorderPane();
@@ -65,7 +70,7 @@ public class VisualisationResult {
          
 
             textY +=15.0;
-            Text totalTimeInSecsText = new Text(textX, textY, " Total time: " + Double.toString(totalTimeInSecs));
+            Text totalTimeInSecsText = new Text(textX, textY, " Total time: " + df.format(totalTimeInSecs));
             //setting font size for route and time taken
             localSearchText.setFont( Font.font("Arial", 15.0));
             totalTimeInSecsText.setFont( Font.font("Arial", 15.0));

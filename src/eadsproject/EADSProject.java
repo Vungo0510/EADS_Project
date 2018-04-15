@@ -64,16 +64,6 @@ public class EADSProject extends Application {
       mheCapacityError.setFill(Paint.valueOf("red"));
       
       //Label for num of MHE
-      Text numOfMHELabel = new Text("Total number of MHEs"); 
-     
-      //Text field for num of MHE 
-      TextField numOfMHEText = new TextField(); 
-      
-      Text numOfMHEError = new Text();
-      numOfMHEError.setFont(Font.font("Calibri", FontWeight.NORMAL, 15));
-      numOfMHEError.setFill(Paint.valueOf("red"));
-      
-      //Label for num of MHE
       Text mheTravelTimeLabel = new Text("Time taken for MHE to travel 1 meter"); 
      
       //Text field for num of MHE 
@@ -213,18 +203,6 @@ public class EADSProject extends Application {
                         mheCapacityError.setText("MHE capacity must be a number");
                     }
                     
-                    if (numOfMHEText.getText().equals("")) {
-                        hasError = true;
-                        numOfMHEError.setText("Number of MHE is required");
-                    }
-                    
-                    try {
-                        Integer.parseInt(mheCapacityText.getText());
-                    } catch (NumberFormatException nfe) {
-                        hasError = true;
-                        numOfMHEError.setText("Number of MHE must be an integer");
-                    }
-                    
                     if (mheTravelTimeText.getText().equals("")) {
                         hasError = true;
                         mheTravelTimeError.setText("MHE travel time is required");
@@ -234,7 +212,7 @@ public class EADSProject extends Application {
                         Double.parseDouble(mheCapacityText.getText());
                     } catch (NumberFormatException nfe) {
                         hasError = true;
-                        mheTravelTimeError.setText("MHE travel time must be a decimal");
+                        mheTravelTimeError.setText("MHE travel time must be a number");
                     }
                     
                     if (mheLiftingTimeText.getText().equals("")) {
@@ -396,7 +374,7 @@ public class EADSProject extends Application {
       GridPane gridPane = new GridPane();    
       
       //Setting size for the pane 
-      gridPane.setMinSize(800, 400); 
+      gridPane.setMinSize(800, 350); 
        
       //Setting the padding    
       gridPane.setPadding(new Insets(10, 10, 10, 10));  
@@ -414,38 +392,34 @@ public class EADSProject extends Application {
       gridPane.add(mheCapacityUnitLabel, 2, 0);
       gridPane.add(mheCapacityError, 1, 1);
       
-      gridPane.add(numOfMHELabel, 0, 2);       
-      gridPane.add(numOfMHEText, 1, 2); 
-      gridPane.add(numOfMHEError, 1, 3);
+      gridPane.add(mheTravelTimeLabel, 0, 2);       
+      gridPane.add(mheTravelTimeText, 1, 2); 
+      gridPane.add(mheTravelTimeUnitLabel, 2, 2);
+      gridPane.add(mheTravelTimeError, 1, 3);
       
-      gridPane.add(mheTravelTimeLabel, 0, 4);       
-      gridPane.add(mheTravelTimeText, 1, 4); 
-      gridPane.add(mheTravelTimeUnitLabel, 2, 4);
-      gridPane.add(mheTravelTimeError, 1, 5);
-      
-      gridPane.add(mheLiftingTimeLabel, 0, 6);       
-      gridPane.add(mheLiftingTimeText, 1, 6);
-      gridPane.add(mheLiftingTimeUnitLabel, 2, 6);
-      gridPane.add(mheLiftingTimeError, 1, 7);
+      gridPane.add(mheLiftingTimeLabel, 0, 4);       
+      gridPane.add(mheLiftingTimeText, 1, 4);
+      gridPane.add(mheLiftingTimeUnitLabel, 2, 4);
+      gridPane.add(mheLiftingTimeError, 1, 5);
       
       
-      gridPane.add(startingPointLabel, 0, 8);       
-      gridPane.add(startingPointText, 1, 8); 
-      gridPane.add(startingPointNote, 2, 8); 
-      gridPane.add(startingPointError, 1, 9);
+      gridPane.add(startingPointLabel, 0, 6);       
+      gridPane.add(startingPointText, 1, 6); 
+      gridPane.add(startingPointNote, 2, 6); 
+      gridPane.add(startingPointError, 1, 7);
        
               
-      gridPane.add(pickingListCSVLabel, 0, 10); 
-      gridPane.add(choosePickingListBtn, 1, 10); 
-      gridPane.add(pickListFileName, 2, 10);
-      gridPane.add(pickListError, 1, 11);
+      gridPane.add(pickingListCSVLabel, 0, 8); 
+      gridPane.add(choosePickingListBtn, 1, 8); 
+      gridPane.add(pickListFileName, 2, 8);
+      gridPane.add(pickListError, 1, 9);
       
-      gridPane.add(cornerNodesCSVLabel, 0, 12); 
-      gridPane.add(chooseCornerNodesBtn, 1, 12); 
-      gridPane.add(cornerNodesFileName, 2, 12);
-      gridPane.add(cornerNodeError, 1, 13);
+      gridPane.add(cornerNodesCSVLabel, 0, 10); 
+      gridPane.add(chooseCornerNodesBtn, 1, 10); 
+      gridPane.add(cornerNodesFileName, 2, 10);
+      gridPane.add(cornerNodeError, 1, 11);
        
-      gridPane.add(buttonSubmit, 2, 14);      
+      gridPane.add(buttonSubmit, 2, 12);      
       
       //Styling nodes   
       buttonSubmit.setStyle("-fx-background-color: \n" +
@@ -459,7 +433,6 @@ public class EADSProject extends Application {
        
       mheCapacityLabel.setStyle("-fx-font: normal bold 15px 'serif' ");
       mheCapacityUnitLabel.setStyle("-fx-font: normal 15px 'serif' ");
-      numOfMHELabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
       mheTravelTimeLabel.setStyle("-fx-font: normal bold 15px 'serif' "); 
       mheTravelTimeUnitLabel.setStyle("-fx-font: normal 15px 'serif' "); 
       mheLiftingTimeUnitLabel.setStyle("-fx-font: normal 15px 'serif' "); 
