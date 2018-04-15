@@ -27,8 +27,8 @@ public class TwiceAroundTheTree {
         //System.out.println(subgraphMap);
         //System.out.println("CORNER NODES:" + cornerNodesWithinBorder);
         //this subgraph contains the corner nodes (after subgraph partitioning) and the pick item nodes
-        System.out.println("subgraph map: ");
-        System.out.println(subgraphMap);
+        //System.out.println("subgraph map: ");
+        //System.out.println(subgraphMap);
         Iterator<Double> subGraphIter = subgraphMap.keySet().iterator();
         int position = 0; //denote the index of element inside key set of this HashMap
         double previousXCoord = -1.0;
@@ -298,10 +298,11 @@ public class TwiceAroundTheTree {
         boolean newRoute = true;
         String startNodeOfThisRoute = startingPoint;
         
-        System.out.println("pick item capacity map: " + pickItemCapacityMap);
-        System.out.println("min span tree: " + minimumSpanningTree);
+        //System.out.println("pick item capacity map: " + pickItemCapacityMap);
+        //System.out.println("min span tree: " + minimumSpanningTree);
         
         for (int i = 0; i < minimumSpanningTree.size() - 1; i++) {
+            boolean gotItem = false;
             String pickNode = minimumSpanningTree.get(i);
             String nextPickNode = minimumSpanningTree.get(i+1);
             double pickNodeCapacity = pickItemCapacityMap.get(pickNode);
@@ -313,9 +314,10 @@ public class TwiceAroundTheTree {
                         pickNodeCapacity++;
                     }
                     totalCapacityOfThisRoute += pickNodeCapacity;
+                    gotItem = true; //to distinguish the case where a route can contain this pick node versus it cannot contain this pick node (in case this pick node + next pick node exceeds capacity)
                 }
             }
-            
+            //if capacity is not reached
             if (totalCapacityOfThisRoute + nextPickNodeCapacity <= mheCapacity) {
                 finalRoutesTimeMap.remove(thisFinalRoute);
                 newRoute = false;
@@ -326,47 +328,60 @@ public class TwiceAroundTheTree {
                 
                 double timeFromThisNodeToNextPickNode = 0.0;
                 
-                if (timeAmongPickNodes.get(pickNode + "to" + nextPickNode) == null) {
-                    timeFromThisNodeToNextPickNode = (double) timeAmongPickNodes.get(nextPickNode + "to" + pickNode);
-                    
-                } else {
-                    timeFromThisNodeToNextPickNode = (double) timeAmongPickNodes.get(pickNode + "to" + nextPickNode);
-                }
-                totalTime += timeFromThisNodeToNextPickNode;
+                if (!pickNode.equals(nextPickNode)) { //if there are 2 adjacent pick nodes that are the same, we can just ignore them if they don't start a new route
+                    if (timeAmongPickNodes.get(pickNode + "to" + nextPickNode) == null) {
+                        timeFromThisNodeToNextPickNode = (double) timeAmongPickNodes.get(nextPickNode + "to" + pickNode);
 
-                String routeFromThisNodeToNextPickNode = (String) routeAmongPickNodes.get(pickNode  + "to" + nextPickNode);
+                    } else {
+                        timeFromThisNodeToNextPickNode = (double) timeAmongPickNodes.get(pickNode + "to" + nextPickNode);
+                    }
+                    totalTime += timeFromThisNodeToNextPickNode;
 
-                //if we can't retrieve the route, we need to flip the key, and then flip the route that we retrieve
-                if (routeFromThisNodeToNextPickNode == null) {
-                    routeFromThisNodeToNextPickNode = (String) routeAmongPickNodes.get(nextPickNode  + "to" + pickNode);
-                    String[] routeFromThisNodeToNextPickNodeSplit = routeFromThisNodeToNextPickNode.split("-");
-                    routeFromThisNodeToNextPickNode = "";
-                    for (int index = routeFromThisNodeToNextPickNodeSplit.length -1 ; index >= 0; index--) {
-                        if (index != 0) {
-                            routeFromThisNodeToNextPickNode += routeFromThisNodeToNextPickNodeSplit[index] + "-";
-                        } else {
-                            routeFromThisNodeToNextPickNode += routeFromThisNodeToNextPickNodeSplit[index];
+                    String routeFromThisNodeToNextPickNode = (String) routeAmongPickNodes.get(pickNode  + "to" + nextPickNode);
+
+                    //if we can't retrieve the route, we need to flip the key, and then flip the route that we retrieve
+                    if (routeFromThisNodeToNextPickNode == null) {
+                        routeFromThisNodeToNextPickNode = (String) routeAmongPickNodes.get(nextPickNode  + "to" + pickNode);
+                        String[] routeFromThisNodeToNextPickNodeSplit = routeFromThisNodeToNextPickNode.split("-");
+                        routeFromThisNodeToNextPickNode = "";
+                        for (int index = routeFromThisNodeToNextPickNodeSplit.length -1 ; index >= 0; index--) {
+                            if (index != 0) {
+                                routeFromThisNodeToNextPickNode += routeFromThisNodeToNextPickNodeSplit[index] + "-";
+                            } else {
+                                routeFromThisNodeToNextPickNode += routeFromThisNodeToNextPickNodeSplit[index];
+                            }
                         }
                     }
-                }
-                //System.out.println("Pick path from " + pickNode + "to" + nextPickNode + ": " + routeFromThisNodeToNextPickNode);
-                if (i != minimumSpanningTree.size() - 2) {
-                    //System.out.println("this route before cut: " + routeFromThisNodeToNextPickNode);
-                    routeFromThisNodeToNextPickNode = routeFromThisNodeToNextPickNode.substring(0, routeFromThisNodeToNextPickNode.lastIndexOf("-"));
-                    //System.out.println("this route: " + routeFromThisNodeToNextPickNode);
-                }
+                    //System.out.println("Pick path from " + pickNode + "to" + nextPickNode + ": " + routeFromThisNodeToNextPickNode);
+                    if (i != minimumSpanningTree.size() - 2) {
+                        //System.out.println("this route before cut: " + routeFromThisNodeToNextPickNode);
+                        routeFromThisNodeToNextPickNode = routeFromThisNodeToNextPickNode.substring(0, routeFromThisNodeToNextPickNode.lastIndexOf("-"));
+                        //System.out.println("this route: " + routeFromThisNodeToNextPickNode);
+                    }
 
-                thisFinalRoute += routeFromThisNodeToNextPickNode + "-";  
-                finalRoutesTimeMap.put(thisFinalRoute, totalTime);
-                //System.out.println("final route so far: " + thisFinalRoute);
-                System.out.println("this node:" + pickNode +" -- Capacity of this node: " + pickNodeCapacity + "-- Capacity of next node: " + nextPickNodeCapacity + "-- This route capacity so far: " + totalCapacityOfThisRoute);
-            } else {
+                    thisFinalRoute += routeFromThisNodeToNextPickNode + "-";  
+                    finalRoutesTimeMap.put(thisFinalRoute, totalTime);
+                    //System.out.println("final route so far: " + thisFinalRoute);
+                    //System.out.println("this node:" + pickNode +" -- Capacity of this node: " + pickNodeCapacity + "-- Capacity of next node: " + nextPickNodeCapacity + "-- This route capacity so far: " + totalCapacityOfThisRoute);
+
+                } else if (newRoute) { //if this pick node and next pick node are the same, we have to add in this node in case this node is the first node of a new route
+                    thisFinalRoute += pickNode + "-";  
+                    finalRoutesTimeMap.put(thisFinalRoute, 0.0);
+                }
+                
+            } else { //if capacity is reached, route has to be finalized
                 finalRoutesTimeMap.remove(thisFinalRoute);
-                System.out.println("this node:" + pickNode +" -- Capacity of this node: " + pickNodeCapacity + "-- Capacity of next node: " + nextPickNodeCapacity + "-- This route capacity so far: " + totalCapacityOfThisRoute);
-                System.out.println("This route capacity final: " + totalCapacityOfThisRoute);
-                if (!thisFinalRoute.equals("")) {
+                //System.out.println("ELSE BLOCK this node:" + pickNode +" -- Capacity of this node: " + pickNodeCapacity + "-- Capacity of next node: " + nextPickNodeCapacity + "-- This route capacity so far: " + totalCapacityOfThisRoute);
+                //System.out.println("This route capacity final: " + totalCapacityOfThisRoute);
+                if (!thisFinalRoute.equals("") || gotItem) {
+                    if (gotItem) {
+                        thisFinalRoute = pickNode + "-";
+                    }  
+                    
                     String[] thisFinalRouteSplit = thisFinalRoute.split("-");
+                      
                     String firstPickNode = thisFinalRouteSplit[0];
+                    //System.out.println(firstPickNode);
                     String[] lastPickNodeSplit = thisFinalRouteSplit[thisFinalRouteSplit.length - 1].split(",");
 
                     Double lastPickNodeXCoord = Double.parseDouble(lastPickNodeSplit[0]);
@@ -374,18 +389,18 @@ public class TwiceAroundTheTree {
                     Double lastPickNodeZCoord = Double.parseDouble(lastPickNodeSplit[2]);
 
                     //add the time and route to travel from starting pt to first pick node
-                    System.out.println("first pick node of this node: " + firstPickNode);
-                    System.out.println("time frm start pt map: " + originalTimeFromStartPtToAllPt);
+                    //System.out.println("first pick node of this node: " + firstPickNode);
+                    //System.out.println("time frm start pt map: " + originalTimeFromStartPtToAllPt);
                     String routeFromStartToFirstPickNode = "";
 
                     if (startNodeOfThisRoute.equals(startingPoint)) {
-                        System.out.println("GOT INTO SMALLER IF");
+                        //System.out.println("GOT INTO SMALLER IF");
                         totalTime += (double) originalTimeFromStartPtToAllPt.get(firstPickNode);
                         routeFromStartToFirstPickNode = (String) routeFromStartPtToAllPt.get(firstPickNode);
                         routeFromStartToFirstPickNode = routeFromStartToFirstPickNode.substring(0, routeFromStartToFirstPickNode.lastIndexOf("-"));
                     } else {
                         //add the time and route to travel from start node to first pick node
-                        System.out.println("GOT INTO SMALLER ELSE");
+                        //System.out.println("GOT INTO SMALLER ELSE");
 
                         String[] firstPickNodeSplit = firstPickNode.split(",");
                         Double firstPickNodeXCoord = Double.parseDouble(firstPickNodeSplit[0]);
@@ -399,19 +414,33 @@ public class TwiceAroundTheTree {
 
                         Double distFromStartNodeToFirstPickNode = (Math.abs(firstPickNodeXCoord - startNodeXCoord)*distOfOneUnitOfXCoordInMeters + Math.abs(firstPickNodeYCoord - startNodeYCoord)*distOfOneUnitOfYCoordInMeters) * mheTravelTime + firstPickNodeZCoord * mheLiftingTime;
                         totalTime += distFromStartNodeToFirstPickNode;
-                        routeFromStartToFirstPickNode = startNodeOfThisRoute + "-" + firstPickNodeXCoord + "," + startNodeYCoord + "," + startNodeZCoord + "-" + firstPickNode;
+                        
+                        if (!gotItem && Math.abs(startNodeXCoord - firstPickNodeXCoord) > 1) {
+                            routeFromStartToFirstPickNode = startNodeOfThisRoute + "-" + firstPickNodeXCoord + "," + startNodeYCoord + "," + startNodeZCoord + "-" + firstPickNode;
+                            //System.out.println("dun hv item: " + routeFromStartToFirstPickNode);
+                        
+                        } else if (gotItem && Math.abs(startNodeXCoord - firstPickNodeXCoord) > 1) {
+                            routeFromStartToFirstPickNode = startNodeOfThisRoute + "-" + firstPickNodeXCoord + "," + startNodeYCoord + "," + startNodeZCoord;
+                            //System.out.println("got item: " + routeFromStartToFirstPickNode);
+                        
+                        } else if (!gotItem) { //if start node and first pick node are on adjacent/same X coord
+                            routeFromStartToFirstPickNode = startNodeOfThisRoute + "-" + firstPickNode;
+                        
+                        } else {
+                            routeFromStartToFirstPickNode = startNodeOfThisRoute;
+                        }
                     }
-                    System.out.println("Pick path from " + startNodeOfThisRoute + "to" + firstPickNode + ": " + routeFromStartToFirstPickNode);
+                    //System.out.println("Pick path from " + startNodeOfThisRoute + "to" + firstPickNode + ": " + routeFromStartToFirstPickNode);
 
                     //add the time and route to travel from last pick node to last node
                     String lastNode = lastPickNodeXCoord + "," + "1.0,0.0";
                     totalTime += (Math.abs(lastPickNodeYCoord - 1.0) * distOfOneUnitOfYCoordInMeters * mheTravelTime + lastPickNodeZCoord * mheLiftingTime);
-                    System.out.println("Pick path from " + thisFinalRouteSplit[thisFinalRouteSplit.length - 1] + "to" + lastNode + ": " + routeFromStartToFirstPickNode);
+                    //System.out.println("Pick path from " + thisFinalRouteSplit[thisFinalRouteSplit.length - 1] + "to" + lastNode + ": " + routeFromStartToFirstPickNode);
 
                     //System.out.println("route from start to pick node: " + routeFromStartToFirstPickNode);
                     thisFinalRoute = routeFromStartToFirstPickNode + "-" + thisFinalRoute + lastNode;
 
-                    System.out.println("this route " + thisFinalRoute + " ---- TATT time for this route: " + totalTime);
+                    //System.out.println("this route " + thisFinalRoute + " ---- TATT time for this route: " + totalTime);
 
 
                     finalRoutesTimeMap.put(thisFinalRoute,totalTime);
@@ -420,6 +449,7 @@ public class TwiceAroundTheTree {
                     
                     //create a new route just for the last item if we happen to end the route on the last iteration
                     if (i == minimumSpanningTree.size() - 2 && nextPickNodeCapacity <= mheCapacity) {
+                        //System.out.println("THE END " + pickNode + "---" + nextPickNode);
                         String[] nextPickNodeSplit = nextPickNode.split(",");
                         Double nextPickNodeXCoord = Double.parseDouble(nextPickNodeSplit[0]);
                         Double nextPickNodeYCoord = Double.parseDouble(nextPickNodeSplit[1]);
@@ -436,12 +466,13 @@ public class TwiceAroundTheTree {
                     
                         lastNode = nextPickNodeXCoord + "," + "1.0,0.0";
                         totalTime += (Math.abs(nextPickNodeYCoord - 1.0) * distOfOneUnitOfYCoordInMeters * mheTravelTime + nextPickNodeZCoord * mheLiftingTime);
-                        System.out.println("Pick path from " + thisFinalRouteSplit[thisFinalRouteSplit.length - 1] + "to" + lastNode + ": " + routeFromStartToFirstPickNode);
+                        //System.out.println("Pick path from " + thisFinalRouteSplit[thisFinalRouteSplit.length - 1] + "to" + lastNode + ": " + routeFromStartToFirstPickNode);
 
                         //System.out.println("route from start to pick node: " + routeFromStartToFirstPickNode);
                         thisFinalRoute = routeFromStartToFirstPickNode + "-" + lastNode;
                         finalRoutesTimeMap.put(thisFinalRoute,totalTime);
                     } else {
+                        //System.out.println("new route now: " + finalRoutesTimeMap);
                         newRoute = true;
                         totalCapacityOfThisRoute = 0;
                         thisFinalRoute = "";
@@ -461,11 +492,11 @@ public class TwiceAroundTheTree {
             }
         }
         
-        System.out.println("final routes time map: " + finalRoutesTimeMap);
-        System.out.println("final routes time map desc keyset: " + finalRoutesTimeMap.descendingKeySet());
+        //System.out.println("final routes time map: " + finalRoutesTimeMap);
+        //System.out.println("final routes time map desc keyset: " + finalRoutesTimeMap.descendingKeySet());
         
         if (!lastRoute.equals("")) {
-            System.out.println("last route raw: " + lastRoute);
+            //System.out.println("last route raw: " + lastRoute);
             String[] lastRouteSplit = lastRoute.split("-");
             String firstPickNode = lastRouteSplit[0];
             String[] lastPickNodeSplit = lastRouteSplit[lastRouteSplit.length - 1].split(",");
@@ -506,7 +537,7 @@ public class TwiceAroundTheTree {
             finalRoutesTimeMap.remove(lastRoute);
             //System.out.println("route from start to pick node: " + routeFromStartToFirstPickNode);
             lastRoute = routeFromStartToFirstPickNode + "-" + lastRoute + lastNode;
-            System.out.println("last route after edit: " + lastRoute);
+            //System.out.println("last route after edit: " + lastRoute);
             finalRoutesTimeMap.put(lastRoute, lastRouteTime);
         
         }

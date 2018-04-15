@@ -256,7 +256,7 @@ public class EADSProject extends Application {
                         }
                         String startingPt = startingPtXCoord.intValue() + "," + startingPtYCoord.intValue();
                         
-                        System.out.println("starting point is: " + startingPt);
+                        //System.out.println("starting point is: " + startingPt);
                         
                         ArrayList<String> pickingList = csvReader.readPickingList(pickListFile.getAbsolutePath());
                         TreeMap<Double, ArrayList<Double>> cornerNodesMap = csvReader.readAllCornerNodes(cornerNodesFile.getAbsolutePath());
@@ -288,7 +288,7 @@ public class EADSProject extends Application {
                         
                         //System.out.println("corner nodes: ");
                         //System.out.println(cornerNodesMap);
-                        System.out.println("Step 1: ");
+                        /*System.out.println("Step 1: ");
                         System.out.println(timeFromStartPtToAllPt);
                         System.out.println("Step 2: ");
                         System.out.println(timeAmongPickItems);
@@ -299,30 +299,30 @@ public class EADSProject extends Application {
                         System.out.println("Step 5b:");
                         System.out.println(finalRoutes);
                         
-                        System.out.println("Final routes and time:");
+                        //System.out.println("Final routes and time:");*/
                         HashMap unmodifiedFinalRoutesTime = c.getTimeOfFinalRoutes(pickingList, finalRoutes, startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
-                        System.out.println(unmodifiedFinalRoutesTime);
+                        //System.out.println(unmodifiedFinalRoutesTime);
                         
                         TreeMap<String, Double> unmodifiedFinalRoutesTimeTreeMap = new TreeMap<>(unmodifiedFinalRoutesTime);
                         LocalSearch ls = new LocalSearch();
                         
                         //visualise result for unmodfied routes (routes before applying local search)
                         TreeMap<String, Double> unmodifiedRoutesWithCornerNodes = ls.addCornerNodesToRoutes(unmodifiedFinalRoutesTimeTreeMap, routeFromStartPtToAllPt, routeAmongPickItems, startingPt);
-                        System.out.println("unmodified routes w corner nodes: ");
-                        System.out.println(unmodifiedRoutesWithCornerNodes);
+                        //System.out.println("unmodified routes w corner nodes: ");
+                        //System.out.println(unmodifiedRoutesWithCornerNodes);
                         TreeMap<String, Double> befLSRouteInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, unmodifiedRoutesWithCornerNodes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
                         String clarkeWrightName = "Clarke-Wright (without local search)";
                         VisualisationResult vr = new VisualisationResult();
                         vr.startResult(unmodifiedRoutesWithCornerNodes,befLSRouteInOriginalLocationMap, clarkeWrightName);
                         
                         //----- local search section
-                        System.out.println("Local search route and time (before adding corner nodes):");
+                        //System.out.println("Local search route and time (before adding corner nodes):");
                         TreeMap<String, Double> lsRoutesMap = ls.localSearch(finalRoutes, pickingList , startingPt, cornerNodesFile.getAbsolutePath(), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
-                        System.out.println("THIZ: " + lsRoutesMap);
+                        //System.out.println("THIZ: " + lsRoutesMap);
                         
-                        System.out.println("Local search route and time (AFTER adding corner nodes): ");
+                        //System.out.println("Local search route and time (AFTER adding corner nodes): ");
                         TreeMap<String, Double> modifiedRoutes = ls.addCornerNodesToRoutes(lsRoutesMap, routeFromStartPtToAllPt, routeAmongPickItems, startingPt);
-                        System.out.println(modifiedRoutes);
+                        //System.out.println(modifiedRoutes);
                         
                        //visualise result for Local Search
                         TreeMap<String, Double> routeInOriginalLocationMap = ls.convertXYZCoordToOriginalLocation(pickingList, modifiedRoutes, pickListFile.getAbsolutePath(), startingPointText.getText(), startingPt);
@@ -332,17 +332,17 @@ public class EADSProject extends Application {
                         
                         
                         
-                        System.out.println("Time map for TATT:");
+                        //System.out.println("Time map for TATT:");
                         HashMap sortedTimeMap = tatt.getTimeAmongNodes(subgraphMap, subgraphPartitioningResult, Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
-                        System.out.println(sortedTimeMap);
+                        //System.out.println(sortedTimeMap);
                         
-                        System.out.println("Minimum spanning map:");
+                        //System.out.println("Minimum spanning map:");
                         HashMap minSpanMap = tatt.getMinimumSpanningMap(sortedTimeMap, subgraphPartitioningResult);
-                        System.out.println("size: " + minSpanMap.keySet().size());
-                        System.out.println(minSpanMap);
+                        //System.out.println("size: " + minSpanMap.keySet().size());
+                        //System.out.println(minSpanMap);
                         
                         TreeMap TATTResult = tatt.getMinimumSpanningTree(minSpanMap, startingPt, intialSolution, ptToPtRouteAndTimeArr, pickItemCapacityMap, Double.parseDouble(mheCapacityText.getText()), Double.parseDouble(mheTravelTimeText.getText()), Double.parseDouble(mheLiftingTimeText.getText()));
-                        System.out.println("TATT route: " + TATTResult);
+                        //System.out.println("TATT route: " + TATTResult);
                         
                         Set modifiedTATTRoutesKeySet = TATTResult.keySet();
                         ArrayList<String> listOfTATTRoutes = new ArrayList<>();
@@ -459,7 +459,7 @@ public class EADSProject extends Application {
    }      
    public static void main(String args[]){ 
       launch(args);
-      System.out.println("JEEEELLLOO ");
+      //System.out.println("JEEEELLLOO ");
      
       
    } 

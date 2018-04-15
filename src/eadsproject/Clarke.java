@@ -427,7 +427,7 @@ public class Clarke {
                                 
                                 
                                 newRoute = flippedAnotherRoute + thisRoute;
-                                System.out.println("new route 426: " + newRoute);
+                                //System.out.println("new route 426: " + newRoute);
                                 
                             } else { //if thisItem and anotherItem are both last nodes in their routes, new route = this route + flipped route 
                                 newRoute = thisRoute;
@@ -439,7 +439,7 @@ public class Clarke {
                                 }
                                 flippedAnotherRoute = flippedAnotherRoute.substring(0, flippedAnotherRoute.length() - 1);
                                 newRoute += "-" + flippedAnotherRoute;
-                                System.out.println("new route 438: " + thisItem + "//" + thisRoute + "---" + anotherItem + "//" + anotherRoute + ": " + newRoute);
+                                //System.out.println("new route 438: " + thisItem + "//" + thisRoute + "---" + anotherItem + "//" + anotherRoute + ": " + newRoute);
                             }
                             
                         } else { //if thisRoute is shorter than or as long as anotherRoute
@@ -452,7 +452,7 @@ public class Clarke {
                                 }
 
                                 newRoute = flippedThisRoute + anotherRoute;
-                                System.out.println("new route 451: " + newRoute);
+                                //System.out.println("new route 451: " + newRoute);
                                 
                             } else { //if thisItem and anotherItem are both last nodes in their routes, new route = this route + flipped route 
                                 newRoute = anotherRoute;
@@ -464,14 +464,14 @@ public class Clarke {
                                 }
                                 flippedThisRoute = flippedThisRoute.substring(0, flippedThisRoute.length() - 1);
                                 newRoute += "-" + flippedThisRoute;
-                                System.out.println("new route 467: " + thisItem + "//" + thisRoute + "---" + anotherItem + "//" + anotherRoute + ": " + newRoute);
+                                //System.out.println("new route 467: " + thisItem + "//" + thisRoute + "---" + anotherItem + "//" + anotherRoute + ": " + newRoute);
                             
                             }
                         }
                     } 
                     //if thisItem and anotherItem appear at different ends of their own routes, just need to merge the 2 routes without flipping
                     else if ((thisRouteSplit[0].equals(thisItem) && anotherRouteSplit[anotherRouteSplit.length - 1].equals(anotherItem)) || (thisRouteSplit[thisRouteSplit.length - 1].equals(thisItem) && anotherRouteSplit[0].equals(anotherItem))) {
-                        System.out.println("different ends: " + "this item: " + thisItem + " -- this route: " + thisRoute + "/// another item: " + anotherItem + "--- another route: " + anotherRoute);
+                        //System.out.println("different ends: " + "this item: " + thisItem + " -- this route: " + thisRoute + "/// another item: " + anotherItem + "--- another route: " + anotherRoute);
                         if (thisRouteSplit[0].equals(thisItem)) { //if thisItem appears at the start of its route and anotherItem appears at the end, we have new route = another route + this route
                             newRoute = anotherRoute + "-" + thisRoute;
                         } else {
@@ -586,7 +586,7 @@ public class Clarke {
                     if (timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) != null) {
                         thisRouteTotalTime += (Double) timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey);
                         //System.out.println("Start: " + routeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey));
-                        System.out.println("start 1 key: " + startNodeToFirstPickNodeKey + ", time: " + timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) + " --- total time so far: " + thisRouteTotalTime);
+                        //System.out.println("start 1 key: " + startNodeToFirstPickNodeKey + ", time: " + timeFromStartPtToPickItem.get(startNodeToFirstPickNodeKey) + " --- total time so far: " + thisRouteTotalTime);
                     }
                     calculated = true;
                 } else {
@@ -595,12 +595,12 @@ public class Clarke {
                     if (timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]) != null) {
                         thisRouteTotalTime += (Double) timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1]);
                         //System.out.println("route detail: " + routeFromPickItemToPickItem.get(finalRouteSplit[0] + "to" + finalRouteSplit[1]));
-                        System.out.println("start 2 key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", time: " + timeFromStartPtToPickItem.get(timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1])) + " --- total time so far: " + thisRouteTotalTime);
+                        //System.out.println("start 2 key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", time: " + timeFromStartPtToPickItem.get(timeFromPickItemToPickItem.get(finalRouteSplit[0] + "-" + finalRouteSplit[1])) + " --- total time so far: " + thisRouteTotalTime);
                         calculated = true;
                     } else if (timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]) != null) {
                         thisRouteTotalTime += (Double) timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0]);
                         //System.out.println("route detail: " + routeFromPickItemToPickItem.get(finalRouteSplit[1] + "to" + finalRouteSplit[0]));
-                        System.out.println("start 3 key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", time: " + timeFromStartPtToPickItem.get(timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0])) + " --- total time so far: " + thisRouteTotalTime);
+                        //System.out.println("start 3 key: " + finalRouteSplit[0] + "-" + finalRouteSplit[1] + ", time: " + timeFromStartPtToPickItem.get(timeFromPickItemToPickItem.get(finalRouteSplit[1] + "-" + finalRouteSplit[0])) + " --- total time so far: " + thisRouteTotalTime);
                         calculated = true;
                     }
                     /*if (!calculated) {
@@ -660,7 +660,7 @@ public class Clarke {
                             thisRouteTotalTime += ((Math.abs(thisNodeY - nextNodeY)*distOfOneUnitOfYCoordInMeters + Math.abs(thisNodeX - nextNodeX)* distOfOneUnitOfYCoordInMeters) * mheTravelTime + Math.abs(thisNodeZ - nextNodeZ) * mheLiftingTime);
                
                         }
-                        System.out.println("route key: " + thisPath + ", time: " + timeFromPickItemToPickItem.get(thisPath) + " --- total time so far: " + thisRouteTotalTime);
+                        //System.out.println("route key: " + thisPath + ", time: " + timeFromPickItemToPickItem.get(thisPath) + " --- total time so far: " + thisRouteTotalTime);
                         
                     }
                     
@@ -679,7 +679,7 @@ public class Clarke {
                thisRouteTotalTime += (Math.abs(lastPickNodeY - lastNodeY)*distOfOneUnitOfYCoordInMeters * mheTravelTime + Math.abs(lastPickNodeZ - lastNodeZ) * mheLiftingTime);
                
                 //lastNodeOfPrevRoute = lastNode;
-               System.out.println("route " + finalRoute + " total time: " + thisRouteTotalTime); 
+               //System.out.println("route " + finalRoute + " total time: " + thisRouteTotalTime); 
                
                finalRoutesDistHashMap.put(finalRoute, thisRouteTotalTime);
             }

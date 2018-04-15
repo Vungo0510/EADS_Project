@@ -74,7 +74,7 @@ public class CSVReader {
         //String csvFile = "./Data/PickingList.csv"; //Already shifted to the correct position for ppl to walk on
        
         File f = new File(csvFile);
-        System.out.println(f.getAbsolutePath());
+        //System.out.println(f.getAbsolutePath());
         
         BufferedReader br = null;
         String line = "";
@@ -122,7 +122,7 @@ public class CSVReader {
         //String csvFile = "./Data/PickingList.csv"; //Already shifted to the correct position for ppl to walk on
        
         File f = new File(csvFile);
-        System.out.println(f.getAbsolutePath());
+        //System.out.println(f.getAbsolutePath());
         
         BufferedReader br = null;
         String line = "";
@@ -167,7 +167,7 @@ public class CSVReader {
         //String csvFile = "./Data/PickingList.csv"; //Already shifted to the correct position for ppl to walk on
        
         File f = new File(csvFile);
-        System.out.println(f.getAbsolutePath());
+        //System.out.println(f.getAbsolutePath());
         
         BufferedReader br = null;
         String line = "";
