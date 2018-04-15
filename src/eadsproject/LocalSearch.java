@@ -399,10 +399,10 @@ public class LocalSearch {
                             // converting the last corner node at y coordinate = 77
                             nodeYCoord = "30";
                         } else {
-                            //System.out.println("node Y coord: " + nodeYCoord);
+                            
                             Double nodeYCoordInDouble = Double.parseDouble(nodeYCoord);
                             Double nodeYCoordOriginalCoord = (nodeYCoordInDouble * 2 + 19)/3;
-                            
+                            System.out.println("node Y coord: " + nodeYCoord + "original coord: " + nodeYCoordOriginalCoord);
                             if (nodeYCoordOriginalCoord % 1 != 0.0) {
                                 nodeYCoordOriginalCoord = (nodeYCoordInDouble * 2 + 17)/3;
                             }

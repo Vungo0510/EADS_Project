@@ -184,11 +184,24 @@ public class EADSProject extends Application {
                     }
                     
                     try {
-                        Integer.parseInt(startingPtSplit[0]);
-                        Integer.parseInt(startingPtSplit[1].substring(0, startingPtSplit[1].length() - 1));
+                        Integer startingPtLane = Integer.parseInt(startingPtSplit[0]);
+                        
+                        Integer startingPtRack = Integer.parseInt(startingPtSplit[1].substring(0, startingPtSplit[1].length() - 1));
+                        if (!startingPtSplit[1].contains("M") && !startingPtSplit[1].contains("m")) {
+                            startingPtRack = Integer.parseInt(startingPtSplit[1]);
+                        }
+                        
+                        if (startingPtLane < 4 || startingPtLane > 18) {
+                            hasError = true;
+                            startingPointError.setText("Starting point lane must be between 4 to 18");
+                        } else if (startingPtRack < 6 || startingPtRack > 57) {
+                            hasError = true;
+                            startingPointError.setText("Starting point rack must be between 6 and 57");
+                        }
+                    
                     } catch (NumberFormatException nfe) {
                         hasError = true;
-                        startingPointError.setText("X and Y coordinate of starting point must be an integer");
+                        startingPointError.setText("Lane and rack of starting point must be an integer");
                     }
                     
                     if (mheCapacityText.getText().equals("")) {
